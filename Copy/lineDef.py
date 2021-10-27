@@ -1,4 +1,5 @@
 # 赛道巡线跟踪 - By: 11374 - 周一 10月 25 2021
+import data as DA
 
 grayLine = (63, 100, -128, 127, -128, 127)  # 用于巡线的阈值
 err = 5  # 误差允许角度
@@ -53,4 +54,6 @@ def line_track(img, track_color):
     img.draw_line(line.line(), color=127)
     if line.magnitude() > 8:
         direct, angle_deg = line_to_theta_and_dir(line)
+        DA.direction = direct # 将数据传出，准备发送给主控
+        DA.angle = angle_deg # 将数据传出，准备发送给主控
         return direct, angle_deg
