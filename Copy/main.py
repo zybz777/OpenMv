@@ -1,33 +1,43 @@
+# 主函数 - By: zyb - 周一 10月 25 2021
 import sensor, image, time
 import colorDef as CD
 import lineDef as LD
-
-"""    初始化openmv摄像头模块     """
+import data as DA
+"""    初始化openmv     """
 sensor.reset()
 sensor.set_pixformat(sensor.RGB565)
 sensor.set_framesize(sensor.QQQVGA)
 sensor.skip_frames(time=2000)
 sensor.set_auto_gain(False)
 sensor.set_auto_whitebal(False)
-clock = time.clock()  # Create a clock object to track the FPS.
-"""    定义狗子状态    """
+clock = time.clock()
 
 """    主循环    """
 while (True):
-    clock.tick()  # Update the FPS clock.
-    # img = sensor.snapshot()  # Take a picture and return the image.
-
+    clock.tick()
     sensor.set_pixformat(sensor.RGB565)
     img = sensor.snapshot()
+    """ ------小球判断------ """
+    #if CD.ballColor == 0:
+        #CD.ballRecog(img)
+    #else:
+        #CD.ballColorMatch(img)  # 匹配开舱门的颜色位置
+    """ ------颜色检测------- """
+    CD.colorSend(img, 'brown')
+    CD.colorSend(img, 'red')
+    CD.colorSend(img, 'green')
+    CD.colorSend(img, 'yellow')
+    CD.colorSend(img, 'blue')
+    """ ------赛道检测------ """
+    LD.line_track(img)
+    # print(LD.line_track(img))
+    """ ------数据发送------ """
 
-
-    #CD.colorRecog(img, 'brown', CD.color_threshold)
-    #CD.colorRecog(img, 'red', CD.color_threshold)
-    #CD.colorRecog(img, 'green', CD.color_threshold)
-    #CD.colorRecog(img, 'yellow', CD.color_threshold)
-    CD.colorRecog(img, 'blue', CD.blue, CD.color_threshold)
-
-    #a = LD.line_track(img, LD.grayLine)
-    #time.sleep_ms(10)
-    #print(a)
-    #print(clock.fps())
+    DA.sendData()
+    DA.header2 = 7
+    DA.color = 0
+    DA.direction = 0
+    DA.angle = 0
+    DA.isOpen = 0
+    DA.end = 0x5B
+    # print(clock.fps())

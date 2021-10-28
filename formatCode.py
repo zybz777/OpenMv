@@ -92,16 +92,8 @@ def colorRecog(img, color):
                             color,
                             scale=1,
                             mono_space=False)
-            #print(numColor)
-
-            return numColor  # 返回值位颜色编号
-
-def colorSend(img,color):
-    """ 识别颜色并发送数据 """
-    data1 = colorRecog(img, color)
-    print(data1)
-    if data1 != None:
-        DA.color = data1
+            print(color)
+            DA.color = numColor  # 将数据传出，准备发送给主控
 
 
 def ballRecog(img):
@@ -117,7 +109,7 @@ def ballRecog(img):
         c = findMaxCircle(circles)
         area = (c.x() - c.r(), c.y() - c.r(), 2 * c.r(), 2 * c.r())  # area为识别到的圆的区域，即圆的外接矩形框
         img.draw_circle(c.x(), c.y(), c.r())
-
+        
         statistics = img.get_statistics(roi=area)  # 像素颜色统计
         print(statistics)
 
@@ -140,13 +132,13 @@ def ballColorMatch(img):
     if ballColor == green:
         colorRecog(img, 'green')
         ballColor = 0  # 本次循环送球完毕
-        DA.isOpen = 1 # 传出数据
+        DA.isOpen = 1  # 传出数据
     elif ballColor == red:
         colorRecog(img, 'red')
         ballColor = 0  # 本次循环送球完毕
-        DA.isOpen = 1 # 传出数据
+        DA.isOpen = 1  # 传出数据
     elif ballColor == brown:
         colorRecog(img, 'brown')
         ballColor = 0  # 本次循环送球完毕
-        DA.isOpen = 1 # 传出数据
+        DA.isOpen = 1  # 传出数据
 
