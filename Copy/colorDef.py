@@ -23,9 +23,9 @@ color_threshold = {
     }
 }
 
-RedLab = color_threshold['red']['threshold']
-GreenLab = color_threshold['green']['threshold']
-BrownLab = color_threshold['brown']['threshold']
+RedLab = color_threshold['red']['threshold'][0]
+GreenLab = color_threshold['green']['threshold'][0]
+BrownLab = color_threshold['brown']['threshold'][0]
 
 # 定义颜色
 black = 0
@@ -35,7 +35,7 @@ brown = 3
 yellow = 4
 blue = 5
 
-ballColor = 0  # 记录快递球的颜色
+ballColor = 0  # 球的颜色
 
 
 def findMaxBlob(blobs):
@@ -84,28 +84,34 @@ def colorRecog(img, color):
                            margin=10)
     if blobs:
         blob = findMaxBlob(blobs)
-        s = (blob.w() + blob.h()) / 2  # 定义距离
-        if s > 20:
+        s = blob.w() * blob.h()  # 定义距离
+        if s > 300:
             img.draw_rectangle(blob.rect())
             img.draw_string(blob.cx(),
                             blob.cy(),
                             color,
                             scale=1,
                             mono_space=False)
-            #print(numColor)
-
+            # print(color)
             return numColor  # 返回值位颜色编号
 
-def colorSend(img,color):
+
+def colorSend(img, color):
     """ 识别颜色并发送数据 """
+    global ballColor
+
     data1 = colorRecog(img, color)
-    print(data1)
-    if data1 != None:
-        DA.color = data1
+    if data1 is not None:
+        DA.setData(data1, 'color')
+
+    # 状态复位 临近终点，准备再次录入小球
+    if data1 == brown:
+        ballColor = 0  # 球的颜色
 
 
 def ballRecog(img):
     """ 识别快递球 """
+    global ballColor
     circles = img.find_circles(threshold=3500,
                                x_margin=10,
                                y_margin=10,
@@ -115,38 +121,39 @@ def ballRecog(img):
                                r_step=2)
     if circles:
         c = findMaxCircle(circles)
-        area = (c.x() - c.r(), c.y() - c.r(), 2 * c.r(), 2 * c.r())  # area为识别到的圆的区域，即圆的外接矩形框
+        area = (c.x() - c.r(), c.y() - c.r(), 2 * c.r(), 2 * c.r()
+                )  # area为识别到的圆的区域，即圆的外接矩形框
         img.draw_circle(c.x(), c.y(), c.r())
 
         statistics = img.get_statistics(roi=area)  # 像素颜色统计
-        print(statistics)
-
         # 判断是否红球
-        if RedLab[0] < statistics.l_mode() < RedLab[1] and RedLab[2] < statistics.a_mode() < RedLab[3] and RedLab[4] < statistics.b_mode() < RedLab[5]:
+        if RedLab[0] < statistics.l_mode(
+        ) < RedLab[1] and RedLab[2] < statistics.a_mode(
+        ) < RedLab[3] and RedLab[4] < statistics.b_mode() < RedLab[5]:
             print("getREDBall")
             ballColor = red  # 用于下次颜色识别时的判断是否抛出球
         # 判断是否绿球
-        elif GreenLab[0] < statistics.l_mode() < GreenLab[1] and GreenLab[2] < statistics.a_mode() < GreenLab[3] and GreenLab[4] < statistics.b_mode() < GreenLab[5]:
+        elif GreenLab[0] < statistics.l_mode(
+        ) < GreenLab[1] and GreenLab[2] < statistics.a_mode(
+        ) < GreenLab[3] and GreenLab[4] < statistics.b_mode() < GreenLab[5]:
             print("getGREENball")
             ballColor = green  # 用于下次颜色识别时的判断是否抛出球
         # 判断是否棕球
-        elif BrownLab[0] < statistics.l_mode() < BrownLab[1] and BrownLab[2] < statistics.a_mode() < BrownLab[3] and BrownLab[4] < statistics.b_mode() < BrownLab[5]:
+        elif BrownLab[0] < statistics.l_mode(
+        ) < BrownLab[1] and BrownLab[2] < statistics.a_mode(
+        ) < BrownLab[3] and BrownLab[4] < statistics.b_mode() < BrownLab[5]:
             print("getBROWNball")
             ballColor = brown  # 用于下次颜色识别时的判断是否抛出球
+        else:
+            ballColor = 0
+            print("no useful ball")
 
 
 def ballColorMatch(img):
     """" 匹配现有球的颜色 """
-    if ballColor == green:
-        colorRecog(img, 'green')
-        ballColor = 0  # 本次循环送球完毕
-        DA.isOpen = 1 # 传出数据
-    elif ballColor == red:
-        colorRecog(img, 'red')
-        ballColor = 0  # 本次循环送球完毕
-        DA.isOpen = 1 # 传出数据
-    elif ballColor == brown:
-        colorRecog(img, 'brown')
-        ballColor = 0  # 本次循环送球完毕
-        DA.isOpen = 1 # 传出数据
-
+    if ballColor == green and colorRecog(img, 'green') == green:
+        DA.setData(1, 'isOpen')
+    elif ballColor == red and colorRecog(img, 'red') == red:
+        DA.setData(1, 'isOpen')
+    elif ballColor == brown and colorRecog(img, 'brown') == brown:
+        DA.setData(1, 'isOpen')

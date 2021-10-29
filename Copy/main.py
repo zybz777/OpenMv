@@ -11,33 +11,26 @@ sensor.skip_frames(time=2000)
 sensor.set_auto_gain(False)
 sensor.set_auto_whitebal(False)
 clock = time.clock()
-
 """    主循环    """
-while (True):
+while True:
     clock.tick()
-    sensor.set_pixformat(sensor.RGB565)
     img = sensor.snapshot()
     """ ------小球判断------ """
-    #if CD.ballColor == 0:
-        #CD.ballRecog(img)
-    #else:
-        #CD.ballColorMatch(img)  # 匹配开舱门的颜色位置
+    if CD.ballColor == 0:
+        CD.ballRecog(img)
+    else:
+        CD.ballColorMatch(img)  # 匹配开舱门的颜色位置
     """ ------颜色检测------- """
+    CD.colorSend(img, 'blue')
     CD.colorSend(img, 'brown')
     CD.colorSend(img, 'red')
     CD.colorSend(img, 'green')
     CD.colorSend(img, 'yellow')
     CD.colorSend(img, 'blue')
     """ ------赛道检测------ """
-    LD.line_track(img)
+    LD.line_track(img.copy())
     # print(LD.line_track(img))
     """ ------数据发送------ """
-
     DA.sendData()
-    DA.header2 = 7
-    DA.color = 0
-    DA.direction = 0
-    DA.angle = 0
-    DA.isOpen = 0
-    DA.end = 0x5B
-    # print(clock.fps())
+    DA.clearData()
+    print(clock.fps())

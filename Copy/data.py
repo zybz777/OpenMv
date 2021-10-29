@@ -13,20 +13,39 @@ isOpen = 0
 end = 0x5B
 
 
+def setData(data, target):
+    """ 写入数据 """
+    global color
+    global direction
+    global angle
+    global isOpen
+
+    if target == 'color':
+        color = data
+    elif target == 'direction':
+        direction = data
+    elif target == 'angle':
+        angle = data
+    elif target == 'isOpen':
+        isOpen = data
+
 
 def clearData():
     """ 数据复位 """
-    header1 = 0x2C
-    header2 = 7
+    global color
+    global direction
+    global angle
+    global isOpen
+
     color = 0
     direction = 0
     angle = 0
     isOpen = 0
-    end = 0x5B
 
 
 def sendData():
     """ 数据发送 """
     allData = [header1, header2, color, direction, angle, isOpen, end]
+    print(allData)
     datas = bytearray(allData)
     uart.write(datas)
