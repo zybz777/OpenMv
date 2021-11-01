@@ -107,7 +107,7 @@ def colorSend(img, color):
     # 状态复位 临近终点，准备再次录入小球
     if data1 == brown:
         ballColor = 0  # 球的颜色
-
+    return data1
 
 def ballRecog(img):
     """ 识别快递球 """
@@ -151,9 +151,9 @@ def ballRecog(img):
 
 def ballColorMatch(img):
     """" 匹配现有球的颜色 """
-    if ballColor == green and colorRecog(img, 'green') == green:
+    if ballColor == green:
         DA.setData(1, 'isOpen')
-    elif ballColor == red and colorRecog(img, 'red') == red:
+    elif ballColor == red:
         DA.setData(1, 'isOpen')
-    elif ballColor == brown and colorRecog(img, 'brown') == brown:
+    elif ballColor == brown:
         DA.setData(1, 'isOpen')

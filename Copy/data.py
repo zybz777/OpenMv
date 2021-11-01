@@ -46,6 +46,6 @@ def clearData():
 def sendData():
     """ 数据发送 """
     allData = [header1, header2, color, direction, angle, isOpen, end]
-    print(allData)
+    # print(allData)
     datas = bytearray(allData)
     uart.write(datas)
