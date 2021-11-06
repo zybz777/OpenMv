@@ -10,10 +10,10 @@ color_threshold = {
         'threshold': [(43, 60, -12, 16, 38, 62)]
     },
     'red': {
-        'threshold': [(34, 66, 7, 42, -30, 11)]
+        'threshold': [(34, 72, 7, 42, -46, 11)]
     },
     'green': {
-        'threshold': [(36, 64, -40, -17, 23, 49)]
+        'threshold': [(36, 64, -40, -17, 23, 49)] # 阈值偏暗，在光线充足下识别不出
     },
     'yellow': {
         'threshold': [(70, 83, -24, 8, 34, 74)]
@@ -79,8 +79,8 @@ def colorRecog(img, color):
     # 颜色匹配
     blobs = img.find_blobs(color_threshold[color]['threshold'],
                            merge=True,
-                           pixels_threshold=30,
-                           area_threshold=30,
+                           pixels_threshold=5,
+                           area_threshold=5,
                            margin=10)
     if blobs:
         blob = findMaxBlob(blobs)
@@ -92,7 +92,7 @@ def colorRecog(img, color):
                             color,
                             scale=1,
                             mono_space=False)
-            # print(color)
+            #print(color)
             return numColor  # 返回值位颜色编号
 
 
@@ -117,7 +117,7 @@ def ballRecog(img):
                                y_margin=10,
                                r_margin=10,
                                r_min=2,
-                               r_max=100,
+
                                r_step=2)
     if circles:
         c = findMaxCircle(circles)
@@ -145,8 +145,7 @@ def ballRecog(img):
             print("getBROWNball")
             ballColor = brown  # 用于下次颜色识别时的判断是否抛出球
         else:
-            ballColor = 0
-            print("no useful ball")
+            print("noUseBall")
 
 
 def ballColorMatch(img):
