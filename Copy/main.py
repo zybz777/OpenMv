@@ -39,6 +39,8 @@ while True:
             state = 2
             print('blue')
             print("state change")
+            time.sleep(1)
+            light.pulse_width_percent(10)
 
     elif state == 2: # 小球判断
         CD.ballRecog(img)
@@ -47,7 +49,8 @@ while True:
             if CD.ballColor == CD.green:
                 time.sleep(3)
             print("state change")
-
+            time.sleep(1)
+            light.pulse_width_percent(0)
 
     elif state == 3: # 识别绿色，用户1，是否开舱门
         if CD.colorSend(img, 'green') == CD.green:
@@ -58,7 +61,7 @@ while True:
             state = 4
             print('green')
             print("state change")
-
+            time.sleep(1)
 
     elif state == 4: # 识别黄色，上台阶
         if CD.colorSend(img, 'yellow') == CD.yellow:
@@ -68,7 +71,7 @@ while True:
             state = 5
             print('yellow')
             print("state change")
-
+            time.sleep(1)
 
     elif state == 5: # 识别红色，用户2，是否开舱门，且下斜坡
         if CD.colorSend(img, 'red') == CD.red:
@@ -80,7 +83,7 @@ while True:
             light.pulse_width_percent(100) # 打开补光版
             print('red')
             print("state change")
-
+            time.sleep(1)
 
     elif state == 6: # 识别绿色，草地，可能需要多声明一个串口信息位，需要补光灯
         if CD.colorSend(img, 'green') == CD.green:
@@ -91,7 +94,7 @@ while True:
             light.pulse_width_percent(0) # 关闭补光版
             print('green')
             print("state change")
-
+            time.sleep(1)
 
     elif state == 7: # 识别棕色，用户3，是否开舱门
         if CD.colorSend(img, 'brown') == CD.brown:
@@ -102,17 +105,26 @@ while True:
             state = 1
             print('brown')
             print("state change")
-    """
+            time.sleep(1)
 
+    """
+    """ ------功能检测------ """
+   # CD.colorSend(img, 'blue')
+    #CD.colorSend(img, 'green')
+    #CD.colorSend(img, 'yellow')
+    #CD.colorSend(img, 'red')
+    #CD.colorSend(img, 'brown')
+    light.pulse_width_percent(1) # 控制亮度 0~100
+    CD.ballRecog(img)
     """ ------赛道检测------ """
     #pyb.LED(1).on()
     #pyb.LED(2).on()
     #pyb.LED(3).on()
     #CD.ballRecog(img)
-    CD.colorSend(img, 'green')
+    #CD.colorSend(img, 'green')
     #print(LD.line_track(img))
     # print(LD.line_track(img))
     """ ------数据发送------ """
-    #DA.sendData()
-    #DA.clearData()
+    DA.sendData()
+    DA.clearData()
     #print(clock.fps()) # 显示FPS

@@ -7,16 +7,16 @@ color_threshold = {
         'threshold': [(1, 2, -2, -1, 0, 0)]
     },
     'brown': {
-        'threshold': [(43, 60, -12, 16, 38, 62)]
+        'threshold': [(43, 60, -13, 16, 21, 62)]
     },
     'red': {
-        'threshold': [(34, 72, 7, 42, -46, 11)]
+        'threshold': [(22, 60, 7, 42, -46, 11)]
     },
     'green': {
-        'threshold': [(36, 64, -40, -17, 23, 49)] # 阈值偏暗，在光线充足下识别不出
+        'threshold': [(40, 76, -40, -17, 20, 40)] # 阈值偏暗，在光线充足下识别不出
     },
     'yellow': {
-        'threshold': [(70, 83, -24, 8, 34, 74)]
+        'threshold': [(57, 69, -26, -5, 18, 60)]
     },
     'blue': {
         'threshold': [(45, 78, -28, 21, -32, -8)]
@@ -79,8 +79,8 @@ def colorRecog(img, color):
     # 颜色匹配
     blobs = img.find_blobs(color_threshold[color]['threshold'],
                            merge=True,
-                           pixels_threshold=5,
-                           area_threshold=5,
+                           pixels_threshold=1,
+                           area_threshold=1,
                            margin=10)
     if blobs:
         blob = findMaxBlob(blobs)
