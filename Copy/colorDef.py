@@ -132,18 +132,21 @@ def ballRecog(img):
         ) < RedLab[3] and RedLab[4] < statistics.b_mode() < RedLab[5]:
             print("getREDBall")
             ballColor = red  # 用于下次颜色识别时的判断是否抛出球
+            DA.setData(ballColor,'ball')
         # 判断是否绿球
         elif GreenLab[0] < statistics.l_mode(
         ) < GreenLab[1] and GreenLab[2] < statistics.a_mode(
         ) < GreenLab[3] and GreenLab[4] < statistics.b_mode() < GreenLab[5]:
             print("getGREENball")
             ballColor = green  # 用于下次颜色识别时的判断是否抛出球
+            DA.setData(ballColor,'ball')
         # 判断是否棕球
         elif BrownLab[0] < statistics.l_mode(
         ) < BrownLab[1] and BrownLab[2] < statistics.a_mode(
         ) < BrownLab[3] and BrownLab[4] < statistics.b_mode() < BrownLab[5]:
             print("getBROWNball")
             ballColor = brown  # 用于下次颜色识别时的判断是否抛出球
+            DA.setData(ballColor,'ball')
         else:
             print("noUseBall")
 

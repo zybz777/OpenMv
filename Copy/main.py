@@ -28,7 +28,6 @@ while True:
     clock.tick()
     img = sensor.snapshot()
     """ ------颜色检测------- """
-    """
     if state == 1: # 识别蓝色，准备装载小球
         if CD.colorSend(img, 'blue') == CD.blue:
             count = count + 1
@@ -45,9 +44,12 @@ while True:
     elif state == 2: # 小球判断
         CD.ballRecog(img)
         if CD.ballColor != 0: # 识别到小球
+            count += 1
+
+        if count > N/2:
             state = 3
-            if CD.ballColor == CD.green:
-                time.sleep(3)
+        #if CD.ballColor == CD.green:
+            #time.sleep(3)
             print("state change")
             time.sleep(1)
             light.pulse_width_percent(0)
@@ -107,15 +109,15 @@ while True:
             print("state change")
             time.sleep(1)
 
-    """
+
     """ ------功能检测------ """
-   # CD.colorSend(img, 'blue')
+    #CD.colorSend(img, 'blue')
     #CD.colorSend(img, 'green')
     #CD.colorSend(img, 'yellow')
     #CD.colorSend(img, 'red')
     #CD.colorSend(img, 'brown')
-    light.pulse_width_percent(1) # 控制亮度 0~100
-    CD.ballRecog(img)
+    #light.pulse_width_percent(1) # 控制亮度 0~100
+    #CD.ballRecog(img)
     """ ------赛道检测------ """
     #pyb.LED(1).on()
     #pyb.LED(2).on()
