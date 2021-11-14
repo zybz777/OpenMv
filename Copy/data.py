@@ -48,6 +48,7 @@ def clearData():
     isOpen = 0
     ball = 0
 
+
 def sendData():
     """ 数据发送 """
     allData = [header1, header2, color, direction, angle, isOpen, ball, end]

@@ -16,23 +16,24 @@ sensor.set_auto_gain(False)
 sensor.set_auto_whitebal(False)
 clock = time.clock()
 """   补光版定义   """
-light = Timer(2, freq=50000).channel(1, Timer.PWM, pin=Pin("P6"))# 50kHz pin6 timer2 channel1
-light.pulse_width_percent(0) # 控制亮度 0~100
+light = Timer(2,
+              freq=50000).channel(1, Timer.PWM,
+                                  pin=Pin("P6"))  # 50kHz pin6 timer2 channel1
+light.pulse_width_percent(0)  # 控制亮度 0~100
 """    变量定义   """
 state = 1
-count = 0 # 用来控制颜色识别及发送数据的次数
-N = 50 # count 比较数值
-
+count = 0  # 用来控制颜色识别及发送数据的次数
+N = 50  # count 比较数值
 """    主循环    """
 while True:
     clock.tick()
     img = sensor.snapshot()
     """ ------颜色检测------- """
-    if state == 1: # 识别蓝色，准备装载小球
+    if state == 1:  # 识别蓝色，准备装载小球
         if CD.colorSend(img, 'blue') == CD.blue:
             count = count + 1
 
-        if count > N: # 发送10次数据，需要测试stm32的接受效果
+        if count > N:  # 发送10次数据，需要测试stm32的接受效果
             count = 0
             CD.ballColor = 0
             state = 2
@@ -41,20 +42,20 @@ while True:
             time.sleep(1)
             light.pulse_width_percent(10)
 
-    elif state == 2: # 小球判断
+    elif state == 2:  # 小球判断
         CD.ballRecog(img)
-        if CD.ballColor != 0: # 识别到小球
+        if CD.ballColor != 0:  # 识别到小球
             count += 1
 
-        if count > N/2:
+        if count > N / 2:
             state = 3
-        #if CD.ballColor == CD.green:
+            #if CD.ballColor == CD.green:
             #time.sleep(3)
             print("state change")
             time.sleep(1)
             light.pulse_width_percent(0)
 
-    elif state == 3: # 识别绿色，用户1，是否开舱门
+    elif state == 3:  # 识别绿色，用户1，是否开舱门
         if CD.colorSend(img, 'green') == CD.green:
             CD.ballColorMatch(img)  # 匹配开舱门
             count = count + 1
@@ -65,7 +66,7 @@ while True:
             print("state change")
             time.sleep(1)
 
-    elif state == 4: # 识别黄色，上台阶
+    elif state == 4:  # 识别黄色，上台阶
         if CD.colorSend(img, 'yellow') == CD.yellow:
             count = count + 1
         if count > N:
@@ -75,30 +76,30 @@ while True:
             print("state change")
             time.sleep(1)
 
-    elif state == 5: # 识别红色，用户2，是否开舱门，且下斜坡
+    elif state == 5:  # 识别红色，用户2，是否开舱门，且下斜坡
         if CD.colorSend(img, 'red') == CD.red:
             CD.ballColorMatch(img)  # 匹配开舱门
             count = count + 1
         if count > N:
             count = 0
             state = 6
-            light.pulse_width_percent(100) # 打开补光版
+            light.pulse_width_percent(100)  # 打开补光版
             print('red')
             print("state change")
             time.sleep(1)
 
-    elif state == 6: # 识别绿色，草地，可能需要多声明一个串口信息位，需要补光灯
+    elif state == 6:  # 识别绿色，草地，可能需要多声明一个串口信息位，需要补光灯
         if CD.colorSend(img, 'green') == CD.green:
             count = count + 1
         if count > N:
             count = 0
             state = 7
-            light.pulse_width_percent(0) # 关闭补光版
+            light.pulse_width_percent(0)  # 关闭补光版
             print('green')
             print("state change")
             time.sleep(1)
 
-    elif state == 7: # 识别棕色，用户3，是否开舱门
+    elif state == 7:  # 识别棕色，用户3，是否开舱门
         if CD.colorSend(img, 'brown') == CD.brown:
             CD.ballColorMatch(img)  # 匹配开舱门
             count = count + 1
@@ -108,8 +109,6 @@ while True:
             print('brown')
             print("state change")
             time.sleep(1)
-
-
     """ ------功能检测------ """
     #CD.colorSend(img, 'blue')
     #CD.colorSend(img, 'green')

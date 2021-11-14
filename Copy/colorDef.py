@@ -13,7 +13,7 @@ color_threshold = {
         'threshold': [(22, 60, 7, 42, -46, 11)]
     },
     'green': {
-        'threshold': [(40, 76, -40, -17, 20, 40)] # 阈值偏暗，在光线充足下识别不出
+        'threshold': [(40, 76, -40, -17, 20, 40)]  # 阈值偏暗，在光线充足下识别不出
     },
     'yellow': {
         'threshold': [(57, 69, -26, -5, 18, 60)]
@@ -92,7 +92,7 @@ def colorRecog(img, color):
                             color,
                             scale=1,
                             mono_space=False)
-            #print(color)
+            # print(color)
             return numColor  # 返回值位颜色编号
 
 
@@ -109,6 +109,7 @@ def colorSend(img, color):
         ballColor = 0  # 球的颜色
     return data1
 
+
 def ballRecog(img):
     """ 识别快递球 """
     global ballColor
@@ -117,7 +118,6 @@ def ballRecog(img):
                                y_margin=10,
                                r_margin=10,
                                r_min=2,
-
                                r_step=2)
     if circles:
         c = findMaxCircle(circles)
@@ -132,21 +132,21 @@ def ballRecog(img):
         ) < RedLab[3] and RedLab[4] < statistics.b_mode() < RedLab[5]:
             print("getREDBall")
             ballColor = red  # 用于下次颜色识别时的判断是否抛出球
-            DA.setData(ballColor,'ball')
+            DA.setData(ballColor, 'ball')
         # 判断是否绿球
         elif GreenLab[0] < statistics.l_mode(
         ) < GreenLab[1] and GreenLab[2] < statistics.a_mode(
         ) < GreenLab[3] and GreenLab[4] < statistics.b_mode() < GreenLab[5]:
             print("getGREENball")
             ballColor = green  # 用于下次颜色识别时的判断是否抛出球
-            DA.setData(ballColor,'ball')
+            DA.setData(ballColor, 'ball')
         # 判断是否棕球
         elif BrownLab[0] < statistics.l_mode(
         ) < BrownLab[1] and BrownLab[2] < statistics.a_mode(
         ) < BrownLab[3] and BrownLab[4] < statistics.b_mode() < BrownLab[5]:
             print("getBROWNball")
             ballColor = brown  # 用于下次颜色识别时的判断是否抛出球
-            DA.setData(ballColor,'ball')
+            DA.setData(ballColor, 'ball')
         else:
             print("noUseBall")
 
