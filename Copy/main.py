@@ -23,12 +23,14 @@ light.pulse_width_percent(0)  # 控制亮度 0~100
 """    变量定义   """
 state = 1
 count = 0  # 用来控制颜色识别及发送数据的次数
-N = 50  # count 比较数值
+N = 5  # count 比较数值
+print("begin")
 """    主循环    """
 while True:
     clock.tick()
     img = sensor.snapshot()
     """ ------颜色检测------- """
+    """
     if state == 1:  # 识别蓝色，准备装载小球
         if CD.colorSend(img, 'blue') == CD.blue:
             count = count + 1
@@ -41,15 +43,14 @@ while True:
             print("state change")
             LED(2).on()
             time.sleep(1)
-            light.pulse_width_percent(10)
+            light.pulse_width_percent(1)
             LED(2).off()
-
     elif state == 2:  # 小球判断
         CD.ballRecog(img)
         if CD.ballColor != 0:  # 识别到小球
             count += 1
 
-        if count > N / 2:
+        if count > N:
             state = 3
             #if CD.ballColor == CD.green:
             #time.sleep(3)
@@ -123,6 +124,7 @@ while True:
             print("state change")
             time.sleep(1)
             LED(2).off()
+    """
     """ ------功能检测------ """
     #CD.colorSend(img, 'blue')
     #CD.colorSend(img, 'green')
@@ -130,14 +132,14 @@ while True:
     #CD.colorSend(img, 'red')
     #CD.colorSend(img, 'brown')
     #light.pulse_width_percent(1) # 控制亮度 0~100
-    #CD.ballRecog(img)
+    CD.ballRecog(img)
     """ ------赛道检测------ """
     #pyb.LED(1).on()
     #pyb.LED(2).on()
     #pyb.LED(3).on()
     #CD.ballRecog(img)
     #CD.colorSend(img, 'green')
-    print(LD.line_track(img))
+    #print(LD.line_track(img))
     # print(LD.line_track(img))
     """ ------数据发送------ """
     DA.sendData()

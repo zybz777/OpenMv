@@ -1,11 +1,12 @@
 from pyb import Pin, Timer
-inverse_left=False  #change it to True to inverse left wheel
-inverse_right=False #change it to True to inverse right wheel
 
-ain1 =  Pin('P0', Pin.OUT_PP)
-ain2 =  Pin('P1', Pin.OUT_PP)
-bin1 =  Pin('P2', Pin.OUT_PP)
-bin2 =  Pin('P3', Pin.OUT_PP)
+inverse_left = False  #change it to True to inverse left wheel
+inverse_right = False  #change it to True to inverse right wheel
+
+ain1 = Pin('P0', Pin.OUT_PP)
+ain2 = Pin('P1', Pin.OUT_PP)
+bin1 = Pin('P2', Pin.OUT_PP)
+bin2 = Pin('P3', Pin.OUT_PP)
 ain1.low()
 ain2.low()
 bin1.low()
@@ -19,11 +20,12 @@ ch2 = tim.channel(2, Timer.PWM, pin=pwmb)
 ch1.pulse_width_percent(0)
 ch2.pulse_width_percent(0)
 
+
 def run(left_speed, right_speed):
-    if inverse_left==True:
-        left_speed=(-left_speed)
-    if inverse_right==True:
-        right_speed=(-right_speed)
+    if inverse_left == True:
+        left_speed = (-left_speed)
+    if inverse_right == True:
+        right_speed = (-right_speed)
 
     if left_speed < 0:
         ain1.low()
