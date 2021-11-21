@@ -5,7 +5,7 @@ import lineDef as LD
 import data as DA
 import pyb
 
-from pyb import Pin, Timer
+from pyb import Pin, Timer, LED
 import time
 """    初始化openmv     """
 sensor.reset()
@@ -39,8 +39,10 @@ while True:
             state = 2
             print('blue')
             print("state change")
+            LED(2).on()
             time.sleep(1)
             light.pulse_width_percent(10)
+            LED(2).off()
 
     elif state == 2:  # 小球判断
         CD.ballRecog(img)
@@ -52,8 +54,10 @@ while True:
             #if CD.ballColor == CD.green:
             #time.sleep(3)
             print("state change")
+            LED(2).on()
             time.sleep(1)
             light.pulse_width_percent(0)
+            LED(2).off()
 
     elif state == 3:  # 识别绿色，用户1，是否开舱门
         if CD.colorSend(img, 'green') == CD.green:
@@ -63,8 +67,10 @@ while True:
             count = 0
             state = 4
             print('green')
+            LED(2).on()
             print("state change")
             time.sleep(1)
+            LED(2).off()
 
     elif state == 4:  # 识别黄色，上台阶
         if CD.colorSend(img, 'yellow') == CD.yellow:
@@ -72,9 +78,11 @@ while True:
         if count > N:
             count = 0
             state = 5
+            LED(2).on()
             print('yellow')
             print("state change")
             time.sleep(1)
+            LED(2).off()
 
     elif state == 5:  # 识别红色，用户2，是否开舱门，且下斜坡
         if CD.colorSend(img, 'red') == CD.red:
@@ -83,10 +91,12 @@ while True:
         if count > N:
             count = 0
             state = 6
+            LED(2).on()
             light.pulse_width_percent(100)  # 打开补光版
             print('red')
             print("state change")
             time.sleep(1)
+            LED(2).off()
 
     elif state == 6:  # 识别绿色，草地，可能需要多声明一个串口信息位，需要补光灯
         if CD.colorSend(img, 'green') == CD.green:
@@ -95,9 +105,11 @@ while True:
             count = 0
             state = 7
             light.pulse_width_percent(0)  # 关闭补光版
+            LED(2).on()
             print('green')
             print("state change")
             time.sleep(1)
+            LED(2).off()
 
     elif state == 7:  # 识别棕色，用户3，是否开舱门
         if CD.colorSend(img, 'brown') == CD.brown:
@@ -106,9 +118,11 @@ while True:
         if count > N:
             count = 0
             state = 1
+            LED(2).on()
             print('brown')
             print("state change")
             time.sleep(1)
+            LED(2).off()
     """ ------功能检测------ """
     #CD.colorSend(img, 'blue')
     #CD.colorSend(img, 'green')
@@ -123,7 +137,7 @@ while True:
     #pyb.LED(3).on()
     #CD.ballRecog(img)
     #CD.colorSend(img, 'green')
-    #print(LD.line_track(img))
+    print(LD.line_track(img))
     # print(LD.line_track(img))
     """ ------数据发送------ """
     DA.sendData()
