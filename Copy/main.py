@@ -8,6 +8,7 @@ import pyb
 from pyb import Pin, Timer, LED
 import time
 """    初始化openmv     """
+LED(2).on()  # openmv启动标志
 sensor.reset()
 sensor.set_pixformat(sensor.RGB565)
 sensor.set_framesize(sensor.QQQVGA)
@@ -24,124 +25,126 @@ light.pulse_width_percent(0)  # 控制亮度 0~100
 state = 1
 count = 0  # 用来控制颜色识别及发送数据的次数
 N = 5  # count 比较数值
+sleep_time = 1.5  # 全局延迟时间，每个状态切换之间给狗子行走的时间，防止将当前颜色识别成下一状态颜色
 print("begin")
+LED(2).off()  # openmv启动完成
 """    主循环    """
 while True:
     clock.tick()
     img = sensor.snapshot()
     """ ------颜色检测------- """
-    """
+
     if state == 1:  # 识别蓝色，准备装载小球
         if CD.colorSend(img, 'blue') == CD.blue:
-            count = count + 1
-
-        if count > N:  # 发送10次数据，需要测试stm32的接受效果
+            count += 1  # 串口发送数据+1
+        # 状态转换
+        if count > N:
             count = 0
             CD.ballColor = 0
             state = 2
             print('blue')
-            print("state change")
+            print("state1 change to 2")
             LED(2).on()
-            time.sleep(1)
-            light.pulse_width_percent(1)
+            time.sleep(sleep_time)
             LED(2).off()
+            light.pulse_width_percent(1)
+
     elif state == 2:  # 小球判断
         CD.ballRecog(img)
         if CD.ballColor != 0:  # 识别到小球
-            count += 1
-
-        if count > N:
+            count += 1  # 串口发送数据+1
+        # 状态转换
+        if count > 3:
             state = 3
             #if CD.ballColor == CD.green:
             #time.sleep(3)
-            print("state change")
+            print("state2 change to 3")
             LED(2).on()
-            time.sleep(1)
-            light.pulse_width_percent(0)
+            time.sleep(sleep_time)
             LED(2).off()
+            light.pulse_width_percent(0)
 
     elif state == 3:  # 识别绿色，用户1，是否开舱门
         if CD.colorSend(img, 'green') == CD.green:
             CD.ballColorMatch(img)  # 匹配开舱门
-            count = count + 1
+            count += 1
+        # 状态转换
         if count > N:
             count = 0
             state = 4
-            print('green')
+            print("state3 change to 4")
             LED(2).on()
-            print("state change")
-            time.sleep(1)
+            time.sleep(sleep_time)
             LED(2).off()
 
     elif state == 4:  # 识别黄色，上台阶
         if CD.colorSend(img, 'yellow') == CD.yellow:
-            count = count + 1
+            count += 1
+        # 状态转换
         if count > N:
             count = 0
             state = 5
+            print("state4 change to 5")
             LED(2).on()
-            print('yellow')
-            print("state change")
             time.sleep(1)
             LED(2).off()
 
     elif state == 5:  # 识别红色，用户2，是否开舱门，且下斜坡
         if CD.colorSend(img, 'red') == CD.red:
             CD.ballColorMatch(img)  # 匹配开舱门
-            count = count + 1
+            count += 1
+        # 状态转换
         if count > N:
             count = 0
             state = 6
+            print("state5 change to 6")
             LED(2).on()
-            light.pulse_width_percent(100)  # 打开补光版
-            print('red')
-            print("state change")
             time.sleep(1)
             LED(2).off()
+            light.pulse_width_percent(100)  # 打开补光版，草地用
 
-    elif state == 6:  # 识别绿色，草地，可能需要多声明一个串口信息位，需要补光灯
+    elif state == 6:  # 识别绿色，草地, 执行动作需要改为识别到棕色，然后进入下一状态，这一状态中的任务是 巡线直走
         if CD.colorSend(img, 'green') == CD.green:
-            count = count + 1
+            count += 1
+        # 状态转换
         if count > N:
             count = 0
             state = 7
             light.pulse_width_percent(0)  # 关闭补光版
+            print("state6 change to 7")
             LED(2).on()
-            print('green')
-            print("state change")
             time.sleep(1)
             LED(2).off()
 
     elif state == 7:  # 识别棕色，用户3，是否开舱门
         if CD.colorSend(img, 'brown') == CD.brown:
             CD.ballColorMatch(img)  # 匹配开舱门
-            count = count + 1
+            count += 1
+        # 状态转换
         if count > N:
             count = 0
             state = 1
+            print("state7 change to 1")
             LED(2).on()
-            print('brown')
-            print("state change")
             time.sleep(1)
             LED(2).off()
-    """
     """ ------功能检测------ """
-    #CD.colorSend(img, 'blue')
-    #CD.colorSend(img, 'green')
-    #CD.colorSend(img, 'yellow')
-    #CD.colorSend(img, 'red')
-    #CD.colorSend(img, 'brown')
-    #light.pulse_width_percent(1) # 控制亮度 0~100
-    CD.ballRecog(img)
+    # CD.colorSend(img, 'blue')
+    # CD.colorSend(img, 'green')
+    # CD.colorSend(img, 'yellow')
+    # CD.colorSend(img, 'red')
+    # CD.colorSend(img, 'brown')
+    # light.pulse_width_percent(1) # 控制亮度 0~100
+    # CD.ballRecog(img)
     """ ------赛道检测------ """
-    #pyb.LED(1).on()
-    #pyb.LED(2).on()
-    #pyb.LED(3).on()
-    #CD.ballRecog(img)
-    #CD.colorSend(img, 'green')
-    #print(LD.line_track(img))
+    # pyb.LED(1).on()
+    # pyb.LED(2).on()
+    # pyb.LED(3).on()
+    # CD.ballRecog(img)
+    # CD.colorSend(img, 'green')
+    # print(LD.line_track(img))
     # print(LD.line_track(img))
     """ ------数据发送------ """
     DA.sendData()
     DA.clearData()
-    #print(clock.fps()) # 显示FPS
+    # print(clock.fps()) # 显示FPS
