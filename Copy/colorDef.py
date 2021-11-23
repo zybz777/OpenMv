@@ -36,7 +36,6 @@ yellow = 4
 blue = 5
 
 ballColor = 0  # 球的颜色
-ballSize = 0 # 球的尺寸比例
 
 
 def findMaxBlob(blobs):
@@ -51,7 +50,6 @@ def findMaxBlob(blobs):
 
 
 def colorRecog(img, color):
-    global ballSize
     ballSize = 0
     """ 颜色块识别 """
     numColor = 0
@@ -77,15 +75,18 @@ def colorRecog(img, color):
     if blobs:
         blob = findMaxBlob(blobs)
         s = blob.w() * blob.h()  # 定义距离
-        if s > 300:
+        s_threshold = 0
+        if color == 'blue':
+            s_threshold = 500
+        else:
+            s_threshold = 100
+        if s > s_threshold: # 绿色100
             img.draw_rectangle(blob.rect())
             img.draw_string(blob.cx(),
                             blob.cy(),
                             color,
                             scale=1,
                             mono_space=False)
-            ballSize = round(blob.w() / blob.h(),2)
-            print(ballSize)
             # print(color)
             return numColor  # 返回值为颜色编号
 
@@ -103,7 +104,6 @@ def colorSend(img, color):
 
 
 def ballColorRecog(img, color):
-    global ballSize
     ballSize = 0
     """ 颜色块识别 """
     numColor = 0
@@ -131,16 +131,14 @@ def ballColorRecog(img, color):
         s = blob.w() * blob.h()  # 定义距离
         if s > 300:
             ballSize = round(blob.w() / blob.h(),2)
-            if 0.96 < ballSize and ballSize < 1.04:
+            if 0.95 < ballSize and ballSize < 1.05:
                 img.draw_rectangle(blob.rect())
                 img.draw_string(blob.cx(),
                                 blob.cy(),
                                 color,
                                 scale=1,
                                 mono_space=False)
-                print("color: {} size: {}".format(color, ballSize))
-                print("area:{}".format(s))
-                print(blob.rect())
+                #print("color: {} size: {}".format(color, ballSize))
             # print(color)
                 return numColor  # 返回值为颜色编号
 
@@ -148,18 +146,28 @@ def ballRecog(img):
     """ 识别快递球 """
     global ballColor
     ballColor = 0
-    if ballColorRecog(img,'green') == green:
+    g=r=b=0
+    for i in range(3):
+        if ballColorRecog(img,'green') == green:
+            g += 1
+        if ballColorRecog(img,'red') == red:
+            r += 1
+        if ballColorRecog(img,'brown') == brown:
+            b += 1
+    if g == 0 and r == 0 and b == 0:
+        return
+    if g >= b and g >= r:
         ballColor = green  # 用于下次颜色识别时的判断是否抛出球
         DA.setData(ballColor, 'ball')
         print("green ball")
-    if ballColorRecog(img,'red') == red:
+    elif r >= g and r >= b:
         ballColor = red  # 用于下次颜色识别时的判断是否抛出球
         DA.setData(ballColor, 'ball')
         print("red ball")
-    if ballColorRecog(img,'brown') == brown:
-        ballColor = brown  # 用于下次颜色识别时的判断是否抛出球
+    elif b >= g and b >= r:
+        ballColor = red  # 用于下次颜色识别时的判断是否抛出球
         DA.setData(ballColor, 'ball')
-        print("brown ball")
+        print("red ball")
 
 
 def ballColorMatch(img):

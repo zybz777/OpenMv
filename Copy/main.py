@@ -8,7 +8,7 @@ import pyb
 from pyb import Pin, Timer, LED
 import time
 """    初始化openmv     """
-LED(2).on()  # openmv启动标志
+LED(2).on() # openmv启动标志
 sensor.reset()
 sensor.set_pixformat(sensor.RGB565)
 sensor.set_framesize(sensor.QQQVGA)
@@ -24,19 +24,19 @@ light.pulse_width_percent(0)  # 控制亮度 0~100
 """    变量定义   """
 state = 1
 count = 0  # 用来控制颜色识别及发送数据的次数
-N = 5  # count 比较数值
-sleep_time = 1.5  # 全局延迟时间，每个状态切换之间给狗子行走的时间，防止将当前颜色识别成下一状态颜色
+N = 3  # count 比较数值
+sleep_time = 2 # 全局延迟时间，每个状态切换之间给狗子行走的时间，防止将当前颜色识别成下一状态颜色
 print("begin")
-LED(2).off()  # openmv启动完成
+LED(2).off() # openmv启动完成
 """    主循环    """
 while True:
     clock.tick()
     img = sensor.snapshot()
     """ ------颜色检测------- """
-
+    #"""
     if state == 1:  # 识别蓝色，准备装载小球
         if CD.colorSend(img, 'blue') == CD.blue:
-            count += 1  # 串口发送数据+1
+            count += 1 # 串口发送数据+1
         # 状态转换
         if count > N:
             count = 0
@@ -52,9 +52,9 @@ while True:
     elif state == 2:  # 小球判断
         CD.ballRecog(img)
         if CD.ballColor != 0:  # 识别到小球
-            count += 1  # 串口发送数据+1
+            count += 1 # 串口发送数据+1
         # 状态转换
-        if count > 3:
+        if count > 1:
             state = 3
             #if CD.ballColor == CD.green:
             #time.sleep(3)
@@ -74,7 +74,7 @@ while True:
             state = 4
             print("state3 change to 4")
             LED(2).on()
-            time.sleep(sleep_time)
+            time.sleep(4)
             LED(2).off()
 
     elif state == 4:  # 识别黄色，上台阶
@@ -128,23 +128,25 @@ while True:
             LED(2).on()
             time.sleep(1)
             LED(2).off()
+    #"""
     """ ------功能检测------ """
-    # CD.colorSend(img, 'blue')
-    # CD.colorSend(img, 'green')
-    # CD.colorSend(img, 'yellow')
-    # CD.colorSend(img, 'red')
-    # CD.colorSend(img, 'brown')
-    # light.pulse_width_percent(1) # 控制亮度 0~100
-    # CD.ballRecog(img)
+    #light.pulse_width_percent(1)
+    #CD.colorSend(img, 'blue')
+    #CD.colorSend(img, 'green')
+    #CD.colorSend(img, 'yellow')
+    #CD.colorSend(img, 'red')
+    #CD.colorSend(img, 'brown')
+    #light.pulse_width_percent(1) # 控制亮度 0~100
+    #CD.ballRecog(img)
     """ ------赛道检测------ """
-    # pyb.LED(1).on()
-    # pyb.LED(2).on()
-    # pyb.LED(3).on()
-    # CD.ballRecog(img)
-    # CD.colorSend(img, 'green')
-    # print(LD.line_track(img))
+    #pyb.LED(1).on()
+    #pyb.LED(2).on()
+    #pyb.LED(3).on()
+    #CD.ballRecog(img)
+    #CD.colorSend(img, 'green')
+    #print(LD.line_track(img))
     # print(LD.line_track(img))
     """ ------数据发送------ """
     DA.sendData()
     DA.clearData()
-    # print(clock.fps()) # 显示FPS
+    #print(clock.fps()) # 显示FPS
