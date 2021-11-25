@@ -22,7 +22,7 @@ def line_to_theta_and_dir(line):
         if angle_deg < err:
             direct = 0
         else:
-            direct = -1  # 靠右
+            direct = 2  # 靠右
     return (direct, angle_deg)
 
 

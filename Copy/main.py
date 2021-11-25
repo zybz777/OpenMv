@@ -27,13 +27,14 @@ count = 0  # 用来控制颜色识别及发送数据的次数
 N = 3  # count 比较数值
 sleep_time = 2 # 全局延迟时间，每个状态切换之间给狗子行走的时间，防止将当前颜色识别成下一状态颜色
 print("begin")
+print("now is state 1")
 LED(2).off() # openmv启动完成
 """    主循环    """
 while True:
     clock.tick()
     img = sensor.snapshot()
     """ ------颜色检测------- """
-    #"""
+    """
     if state == 1:  # 识别蓝色，准备装载小球
         if CD.colorSend(img, 'blue') == CD.blue:
             count += 1 # 串口发送数据+1
@@ -42,8 +43,7 @@ while True:
             count = 0
             CD.ballColor = 0
             state = 2
-            print('blue')
-            print("state1 change to 2")
+            print("now is state 2")
             LED(2).on()
             time.sleep(sleep_time)
             LED(2).off()
@@ -58,11 +58,12 @@ while True:
             state = 3
             #if CD.ballColor == CD.green:
             #time.sleep(3)
-            print("state2 change to 3")
+            print("now is state 3")
+            light.pulse_width_percent(0)
             LED(2).on()
             time.sleep(sleep_time)
             LED(2).off()
-            light.pulse_width_percent(0)
+
 
     elif state == 3:  # 识别绿色，用户1，是否开舱门
         if CD.colorSend(img, 'green') == CD.green:
@@ -72,7 +73,7 @@ while True:
         if count > N:
             count = 0
             state = 4
-            print("state3 change to 4")
+            print("now is state 4")
             LED(2).on()
             time.sleep(4)
             LED(2).off()
@@ -84,7 +85,7 @@ while True:
         if count > N:
             count = 0
             state = 5
-            print("state4 change to 5")
+            print("now is state 5")
             LED(2).on()
             time.sleep(1)
             LED(2).off()
@@ -97,24 +98,22 @@ while True:
         if count > N:
             count = 0
             state = 6
-            print("state5 change to 6")
+            print("now is state 6")
             LED(2).on()
             time.sleep(1)
             LED(2).off()
             light.pulse_width_percent(100)  # 打开补光版，草地用
 
     elif state == 6:  # 识别绿色，草地, 执行动作需要改为识别到棕色，然后进入下一状态，这一状态中的任务是 巡线直走
-        if CD.colorSend(img, 'green') == CD.green:
-            count += 1
-        # 状态转换
-        if count > N:
+        if CD.colorRecog(img,'brown') == CD.brown:
+            light.pulse_width_percent(0)  # 关闭补光版
             count = 0
             state = 7
-            light.pulse_width_percent(0)  # 关闭补光版
-            print("state6 change to 7")
+            print("now is state 7")
             LED(2).on()
             time.sleep(1)
             LED(2).off()
+
 
     elif state == 7:  # 识别棕色，用户3，是否开舱门
         if CD.colorSend(img, 'brown') == CD.brown:
@@ -124,13 +123,13 @@ while True:
         if count > N:
             count = 0
             state = 1
-            print("state7 change to 1")
+            print("now is state 7")
             LED(2).on()
             time.sleep(1)
             LED(2).off()
-    #"""
+    """
     """ ------功能检测------ """
-    #light.pulse_width_percent(1)
+    #light.pulse_width_percent(100)
     #CD.colorSend(img, 'blue')
     #CD.colorSend(img, 'green')
     #CD.colorSend(img, 'yellow')
@@ -144,7 +143,7 @@ while True:
     #pyb.LED(3).on()
     #CD.ballRecog(img)
     #CD.colorSend(img, 'green')
-    #print(LD.line_track(img))
+    print(LD.line_track(img))
     # print(LD.line_track(img))
     """ ------数据发送------ """
     DA.sendData()

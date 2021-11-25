@@ -16,7 +16,7 @@ color_threshold = {
         'threshold': [(40, 76, -40, -17, 20, 40)]  # 阈值偏暗，在光线充足下识别不出
     },
     'yellow': {
-        'threshold': [(57, 69, -26, -5, 18, 60)]
+        'threshold': [(54, 69, -26, -5, 32, 59)]
     },
     'blue': {
         'threshold': [(45, 78, -28, 21, -32, -8)]
@@ -75,12 +75,20 @@ def colorRecog(img, color):
     if blobs:
         blob = findMaxBlob(blobs)
         s = blob.w() * blob.h()  # 定义距离
-        s_threshold = 0
-        if color == 'blue':
-            s_threshold = 500
+        # 滤波操作 匹配赛道颜色块
+        if color == 'blue' or color == 'red':
+            s_max = 1500
+            s_min = 100
+            print(s)
+            ratio = blob.w() / blob.h()
+            #print(ratio)
+            if  ratio < 3:
+                return 0
         else:
-            s_threshold = 100
-        if s > s_threshold: # 绿色100
+            s_max = 20000
+            s_min = 100
+        # 滤波后输出结果
+        if s_min < s and s < s_max: # 绿色100
             img.draw_rectangle(blob.rect())
             img.draw_string(blob.cx(),
                             blob.cy(),
@@ -131,7 +139,7 @@ def ballColorRecog(img, color):
         s = blob.w() * blob.h()  # 定义距离
         if s > 300:
             ballSize = round(blob.w() / blob.h(),2)
-            if 0.95 < ballSize and ballSize < 1.05:
+            if 0.95 < ballSize and ballSize < 1.05: # 滤波 过滤出长宽比为1的近似圆形
                 img.draw_rectangle(blob.rect())
                 img.draw_string(blob.cx(),
                                 blob.cy(),
