@@ -1,4 +1,5 @@
 # 颜色相关定义 - By: zyb - 周一 10月 25 2021
+# 缺点：没有封装成类，函数调用可能会混乱
 import image
 import data as DA
 """    颜色定义     """
@@ -16,7 +17,7 @@ color_threshold = {
         'threshold': [(40, 76, -40, -17, 20, 40)]  # 阈值偏暗，在光线充足下识别不出
     },
     'yellow': {
-        'threshold': [(54, 69, -26, -5, 32, 59)]
+        'threshold': [(54, 72, -26, -4, 17, 59)]
     },
     'blue': {
         'threshold': [(45, 78, -28, 21, -32, -8)]
@@ -79,16 +80,16 @@ def colorRecog(img, color):
         if color == 'blue' or color == 'red':
             s_max = 1500
             s_min = 100
-            print(s)
+            #print(s)
             ratio = blob.w() / blob.h()
             #print(ratio)
-            if  ratio < 3:
+            if ratio < 3:
                 return 0
         else:
             s_max = 20000
             s_min = 100
         # 滤波后输出结果
-        if s_min < s and s < s_max: # 绿色100
+        if s_min < s and s < s_max:  # 绿色100
             img.draw_rectangle(blob.rect())
             img.draw_string(blob.cx(),
                             blob.cy(),
@@ -113,7 +114,7 @@ def colorSend(img, color):
 
 def ballColorRecog(img, color):
     ballSize = 0
-    """ 颜色块识别 """
+    """ 用户快递球的颜色识别 """
     numColor = 0
     # 匹配一下输入的color是什么颜色
     if color == 'black':
@@ -138,8 +139,8 @@ def ballColorRecog(img, color):
         blob = findMaxBlob(blobs)
         s = blob.w() * blob.h()  # 定义距离
         if s > 300:
-            ballSize = round(blob.w() / blob.h(),2)
-            if 0.95 < ballSize and ballSize < 1.05: # 滤波 过滤出长宽比为1的近似圆形
+            ballSize = round(blob.w() / blob.h(), 2)
+            if 0.95 < ballSize and ballSize < 1.05:  # 滤波 过滤出长宽比为1的近似圆形
                 img.draw_rectangle(blob.rect())
                 img.draw_string(blob.cx(),
                                 blob.cy(),
@@ -147,39 +148,40 @@ def ballColorRecog(img, color):
                                 scale=1,
                                 mono_space=False)
                 #print("color: {} size: {}".format(color, ballSize))
-            # print(color)
+                # print(color)
                 return numColor  # 返回值为颜色编号
 
+
 def ballRecog(img):
-    """ 识别快递球 """
+    """ 结合颜色函数识别快递球，进行了滤波处理提高稳定性 """
     global ballColor
-    ballColor = 0
-    g=r=b=0
+    g = r = b = 0
     for i in range(3):
-        if ballColorRecog(img,'green') == green:
+        if ballColorRecog(img, 'green') == green:
             g += 1
-        if ballColorRecog(img,'red') == red:
+        if ballColorRecog(img, 'red') == red:
             r += 1
-        if ballColorRecog(img,'brown') == brown:
+        if ballColorRecog(img, 'brown') == brown:
             b += 1
     if g == 0 and r == 0 and b == 0:
         return
     if g >= b and g >= r:
-        ballColor = green  # 用于下次颜色识别时的判断是否抛出球
-        DA.setData(ballColor, 'ball')
+        ballColor = green  # 判断为绿球
+        DA.setData(1, 'ball')
         print("green ball")
     elif r >= g and r >= b:
-        ballColor = red  # 用于下次颜色识别时的判断是否抛出球
-        DA.setData(ballColor, 'ball')
+        ballColor = red  # 判断为红球
+        DA.setData(1, 'ball')
         print("red ball")
     elif b >= g and b >= r:
-        ballColor = red  # 用于下次颜色识别时的判断是否抛出球
-        DA.setData(ballColor, 'ball')
-        print("red ball")
+        ballColor = brown  # 判断为棕球
+        DA.setData(1, 'ball')
+        print("brown ball")
 
 
-def ballColorMatch(img):
+def ballColorMatch():
     """" 匹配现有球的颜色 """
+    global ballColor
     if ballColor == green:
         DA.setData(1, 'isOpen')
     elif ballColor == red:

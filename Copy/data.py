@@ -3,7 +3,7 @@ from pyb import UART
 
 uart = UART(3, 115200)
 uart.init(115200, bits=8, parity=None, stop=1)  # 8位数据位，无校验位，1位停止位
-""" ------ 数据定义 ------ """
+""" ------ 数据定义 全局变量 ------ """
 header1 = 0x2C
 header2 = 8
 color = 0
