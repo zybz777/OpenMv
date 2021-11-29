@@ -20,7 +20,7 @@ color_threshold = {
         'threshold': [(54, 72, -26, -4, 17, 59)]
     },
     'blue': {
-        'threshold': [(45, 78, -28, 21, -32, -8)]
+        'threshold': [(45, 68, -28, 21, -32, -8)]
     }
 }
 
@@ -77,19 +77,19 @@ def colorRecog(img, color):
         blob = findMaxBlob(blobs)
         s = blob.w() * blob.h()  # 定义距离
         # 滤波操作 匹配赛道颜色块
-        if color == 'blue' or color == 'red':
+        if color == 'blue' or color == 'red' or color == 'yellow':
             s_max = 1500
             s_min = 100
             #print(s)
             ratio = blob.w() / blob.h()
             #print(ratio)
-            if ratio < 3:
+            if  ratio < 3:
                 return 0
         else:
             s_max = 20000
             s_min = 100
         # 滤波后输出结果
-        if s_min < s and s < s_max:  # 绿色100
+        if s_min < s and s < s_max: # 绿色100
             img.draw_rectangle(blob.rect())
             img.draw_string(blob.cx(),
                             blob.cy(),
@@ -139,8 +139,8 @@ def ballColorRecog(img, color):
         blob = findMaxBlob(blobs)
         s = blob.w() * blob.h()  # 定义距离
         if s > 300:
-            ballSize = round(blob.w() / blob.h(), 2)
-            if 0.95 < ballSize and ballSize < 1.05:  # 滤波 过滤出长宽比为1的近似圆形
+            ballSize = round(blob.w() / blob.h(),2)
+            if 0.95 < ballSize and ballSize < 1.05: # 滤波 过滤出长宽比为1的近似圆形
                 img.draw_rectangle(blob.rect())
                 img.draw_string(blob.cx(),
                                 blob.cy(),
@@ -148,20 +148,19 @@ def ballColorRecog(img, color):
                                 scale=1,
                                 mono_space=False)
                 #print("color: {} size: {}".format(color, ballSize))
-                # print(color)
+            # print(color)
                 return numColor  # 返回值为颜色编号
-
 
 def ballRecog(img):
     """ 结合颜色函数识别快递球，进行了滤波处理提高稳定性 """
     global ballColor
-    g = r = b = 0
+    g=r=b=0
     for i in range(3):
-        if ballColorRecog(img, 'green') == green:
+        if ballColorRecog(img,'green') == green:
             g += 1
-        if ballColorRecog(img, 'red') == red:
+        if ballColorRecog(img,'red') == red:
             r += 1
-        if ballColorRecog(img, 'brown') == brown:
+        if ballColorRecog(img,'brown') == brown:
             b += 1
     if g == 0 and r == 0 and b == 0:
         return
