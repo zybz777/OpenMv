@@ -2,33 +2,15 @@
 # 缺点：没有封装成类，函数调用可能会混乱
 import image
 import data as DA
+from utils import color_type, color_threshold
 """    颜色定义     """
-color_threshold = {
-    'black': {
-        'threshold': [(1, 2, -2, -1, 0, 0)]
-    },
-    'brown': {
-        'threshold': [(43, 60, -13, 16, 21, 62)]
-    },
-    'red': {
-        'threshold': [(22, 60, 7, 42, -46, 11)]
-    },
-    'green': {
-        'threshold': [(40, 76, -40, -17, 20, 40)]  # 阈值偏暗，在光线充足下识别不出
-    },
-    'yellow': {
-        'threshold': [(54, 72, -26, -4, 17, 59)]
-    },
-    'blue': {
-        'threshold': [(45, 68, -28, 21, -32, -8)]
-    }
-}
 
 RedLab = color_threshold['red']['threshold'][0]
 GreenLab = color_threshold['green']['threshold'][0]
 BrownLab = color_threshold['brown']['threshold'][0]
 
 # 定义颜色
+
 black = 0
 green = 1
 red = 2
@@ -83,13 +65,13 @@ def colorRecog(img, color):
             #print(s)
             ratio = blob.w() / blob.h()
             #print(ratio)
-            if  ratio < 3:
+            if ratio < 3:
                 return 0
         else:
             s_max = 20000
             s_min = 100
         # 滤波后输出结果
-        if s_min < s and s < s_max: # 绿色100
+        if s_min < s and s < s_max:  # 绿色100
             img.draw_rectangle(blob.rect())
             img.draw_string(blob.cx(),
                             blob.cy(),
@@ -139,8 +121,8 @@ def ballColorRecog(img, color):
         blob = findMaxBlob(blobs)
         s = blob.w() * blob.h()  # 定义距离
         if s > 300:
-            ballSize = round(blob.w() / blob.h(),2)
-            if 0.95 < ballSize and ballSize < 1.05: # 滤波 过滤出长宽比为1的近似圆形
+            ballSize = round(blob.w() / blob.h(), 2)
+            if 0.95 < ballSize and ballSize < 1.05:  # 滤波 过滤出长宽比为1的近似圆形
                 img.draw_rectangle(blob.rect())
                 img.draw_string(blob.cx(),
                                 blob.cy(),
@@ -148,19 +130,20 @@ def ballColorRecog(img, color):
                                 scale=1,
                                 mono_space=False)
                 #print("color: {} size: {}".format(color, ballSize))
-            # print(color)
+                # print(color)
                 return numColor  # 返回值为颜色编号
+
 
 def ballRecog(img):
     """ 结合颜色函数识别快递球，进行了滤波处理提高稳定性 """
     global ballColor
-    g=r=b=0
+    g = r = b = 0
     for i in range(3):
-        if ballColorRecog(img,'green') == green:
+        if ballColorRecog(img, 'green') == green:
             g += 1
-        if ballColorRecog(img,'red') == red:
+        if ballColorRecog(img, 'red') == red:
             r += 1
-        if ballColorRecog(img,'brown') == brown:
+        if ballColorRecog(img, 'brown') == brown:
             b += 1
     if g == 0 and r == 0 and b == 0:
         return

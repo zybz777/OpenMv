@@ -8,7 +8,7 @@ import pyb
 from pyb import Pin, Timer, LED
 import time
 """    初始化openmv     """
-LED(2).on() # openmv启动标志
+LED(2).on()  # openmv启动标志
 sensor.reset()
 sensor.set_pixformat(sensor.RGB565)
 sensor.set_framesize(sensor.QQQVGA)
@@ -25,11 +25,11 @@ light.pulse_width_percent(0)  # 控制亮度 0~100
 state = 1
 count = 0  # 用来控制颜色识别及发送数据的次数
 N = 3  # count 比较数值
-sleep_time = 2 # 全局延迟时间，每个状态切换之间给狗子行走的时间，防止将当前颜色识别成下一状态颜色
+sleep_time = 2  # 全局延迟时间，每个状态切换之间给狗子行走的时间，防止将当前颜色识别成下一状态颜色
 flag_grass = 0
 print("begin")
 print("now is state 1")
-LED(2).off() # openmv启动完成
+LED(2).off()  # openmv启动完成
 """    主循环    """
 while True:
     clock.tick()
@@ -38,14 +38,14 @@ while True:
     #"""
     if state == 1:  # 识别蓝色，准备装载小球
         if CD.colorSend(img, 'blue') == CD.blue:
-            count += 1 # 串口发送数据+1
+            count += 1  # 串口发送数据+1
         # 状态转换
         if count > N:
             count = 0
             CD.ballColor = 0
             state = 2
             print("now is state 2")
-            LED(2).on() # 状态切换标志
+            LED(2).on()  # 状态切换标志
             time.sleep(sleep_time)
             LED(2).off()
             light.pulse_width_percent(1)
@@ -53,7 +53,7 @@ while True:
     elif state == 2:  # 小球判断
         CD.ballRecog(img)
         if CD.ballColor != 0:  # 识别到小球
-            count += 1 # 串口发送数据+1
+            count += 1  # 串口发送数据+1
         # 状态转换
         if count > 3:
             state = 3
@@ -65,7 +65,6 @@ while True:
             LED(2).on()
             time.sleep(sleep_time)
             LED(2).off()
-
 
     elif state == 3:  # 识别绿色，用户1，是否开舱门
         if CD.colorSend(img, 'green') == CD.green:
@@ -109,9 +108,9 @@ while True:
             light.pulse_width_percent(100)  # 打开补光版，草地用
 
     elif state == 6:  # 识别绿色，草地, 执行动作需要改为识别到棕色，然后进入下一状态，这一状态中的任务是 巡线直走
-        if flag_grass == 0 and CD.colorSend(img,'green') == CD.green:
+        if flag_grass == 0 and CD.colorSend(img, 'green') == CD.green:
             flag_grass = 1
-        elif flag_grass == 1 and CD.colorSend(img,'green') != CD.green:
+        elif flag_grass == 1 and CD.colorSend(img, 'green') != CD.green:
             light.pulse_width_percent(0)  # 关闭补光版
             count = 0
             state = 7
