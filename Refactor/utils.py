@@ -4,7 +4,7 @@ color_type = {
     'black': 0,
     'green': 1,
     'red': 2,
-    'browm': 3,
+    'brown': 3,
     'yellow': 4,
     'blue': 5
 }
@@ -47,6 +47,7 @@ BrownLab = color_threshold['brown']['threshold'][0]
 def find_max_blob(blobs):
     """ 寻找最大颜色块 """
     maxSize = 0
+    maxBlob = None
     for blob in blobs:
         nowSize = blob.w() * blob.h()
         if nowSize > maxSize:

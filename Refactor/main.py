@@ -20,6 +20,7 @@ my_way = Runway()
 print("now is state 1")
 LED(2).off()  # openmv启动完成
 """    主循环    """
+# TODO: 1. 测试重构后的bug；2. stm32 给 openmv 串口发送信息，形成闭环
 while True:
     clock.tick()
     img = sensor.snapshot()

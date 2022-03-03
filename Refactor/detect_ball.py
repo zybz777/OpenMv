@@ -11,7 +11,7 @@ class Ball():
         self.exists = False
 
     def judge_ball_color(self, img, color_input):
-        """ 底层函数， 球的颜色判断 
+        """ 底层函数， 球的颜色判断
         成功, True
         失败, False
         """
@@ -25,7 +25,8 @@ class Ball():
         if blobs is None:
             return False
         blob = find_max_blob(blobs)
-
+        if blob is None:
+            return False
         s = blob.w() * blob.h()  # 定义大小
         if s < 300:
             return False
@@ -45,7 +46,7 @@ class Ball():
             return False
 
     def detect_ball(self, img):
-        """ 上层接口，检测球的颜色 
+        """ 上层接口，检测球的颜色
         """
         g = r = b = 0
         for i in range(3):

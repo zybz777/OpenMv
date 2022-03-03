@@ -72,7 +72,7 @@ class Runway():
                     self.my_ball.send_ball()  # 匹配开舱门并reset
             self.state_trans()
 
-    def state_trans(self, img):
+    def state_trans(self):
         """ 状态转移函数 """
         global count, flag_grass
         # state 1

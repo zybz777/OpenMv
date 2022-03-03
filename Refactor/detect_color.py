@@ -29,6 +29,11 @@ class Detect_color():
 
         # 颜色提取
         blob = find_max_blob(blobs)  # 最大色块
+        if blob is None:
+            self.color_type = None
+            self.color_exist = False
+            return self.color_type, self.color_exist  # 失败退出
+
         s = blob.w() * blob.h()  # 距离依据
         # 滤波操作 匹配赛道颜色块
         if color_input == 'blue' or color_input == 'red' or color_input == 'yellow':
@@ -58,7 +63,7 @@ class Detect_color():
             return self.color_type, self.color_exist  # 成功判断
 
     def color_send(self, img, color_input):
-        """ 识别颜色并发送数据 
+        """ 识别颜色并发送数据
             成功, 返回True
             失败，返回False
         """
