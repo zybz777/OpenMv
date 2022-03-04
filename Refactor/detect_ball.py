@@ -11,9 +11,14 @@ class Detect_ball():
         self.exists = False
 
     def judge_ball_color(self, img, color_input):
-        """ 底层函数， 球的颜色判断
-        成功, True
-        失败, False
+        """判断小球颜色
+
+        Args:
+            img (img): 该帧图像
+            color_input (str): 待识别颜色
+
+        Returns:
+            Bool: True of Flase
         """
         # 颜色匹配
         blobs = img.find_blobs(color_threshold[color_input]['threshold'],
@@ -46,7 +51,13 @@ class Detect_ball():
             return False
 
     def detect_ball(self, img):
-        """ 上层接口，检测球的颜色
+        """判断图像中球及其颜色
+
+        Args:
+            img (img): 该帧图像
+
+        Returns:
+            Bool: True or False 是否识别到小球
         """
         g = r = b = 0
         for i in range(3):
@@ -64,7 +75,7 @@ class Detect_ball():
         if g >= b and g >= r:
             self.color_type = color_type["green"]  # 判断为绿球
             self.exists = True
-            set_data(1, 'ball')
+            set_data(1, 'ball') # 写入串口数据
             print("green ball")
             return True
         elif r >= g and r >= b:
@@ -85,7 +96,8 @@ class Detect_ball():
             return False
 
     def send_ball(self):
-        """" 上层接口，发送球，reset该类 """
+        """判断球是否需要发射
+        """
         if self.color_type == color_type["green"]:
             set_data(1, 'isOpen')
             self.ball_reset()
@@ -97,5 +109,7 @@ class Detect_ball():
             self.ball_reset()
 
     def ball_reset(self):
+        """重置对象内数据
+        """
         self.color_type = None
         self.exists = False

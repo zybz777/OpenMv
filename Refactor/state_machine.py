@@ -25,7 +25,11 @@ class Runway():
         self.my_line = Detect_line()  # 检测中线
 
     def state_exe(self, img):
-        """ 状态执行函数 """
+        """状态机执行
+
+        Args:
+            img (img): 每一帧图像
+        """
         global count, flag_grass
         # state 1
         if self.current_state == statesets["state_1_start"]:

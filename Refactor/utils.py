@@ -45,7 +45,14 @@ BrownLab = color_threshold['brown']['threshold'][0]
 
 
 def find_max_blob(blobs):
-    """ 寻找最大颜色块 """
+    """根据色块列表寻找最大色块
+
+    Args:
+        blobs (blobs): find_color 得到的色块集合
+
+    Returns:
+        blob: 最大色块
+    """
     maxSize = 0
     maxBlob = None
     for blob in blobs:

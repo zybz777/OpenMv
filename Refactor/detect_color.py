@@ -12,9 +12,14 @@ class Detect_color():
         self.color_exist = False  # 是否检测到颜色
 
     def judge_choose_color(self, img, color_input):
-        """ 判断指定颜色
-        成功，返回 颜色编号, True
-        失败，返回 None, False
+        """判断输入的颜色类型
+
+        Args:
+            img (img): 该帧图像
+            color_input (str): 要判断的颜色
+
+        Returns:
+            _type_: self.color_type, self.color_exist
         """
         self.color_type = color_type[color_input]  # 接收输入
         blobs = img.find_blobs(color_threshold[color_input]['threshold'],
@@ -63,9 +68,14 @@ class Detect_color():
             return self.color_type, True  # 成功判断
 
     def color_send(self, img, color_input):
-        """ 识别颜色并发送数据
-            成功, 返回True
-            失败, 返回False
+        """识别颜色并将信息写入串口数据
+
+        Args:
+            img (img): 该帧图像
+            color_input (str): 待检测颜色
+
+        Returns:
+            Bool: True or False
         """
         self.judge_choose_color(img, color_input)
         if self.color_exist is True:
