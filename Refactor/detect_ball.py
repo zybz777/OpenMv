@@ -1,11 +1,11 @@
 """重构 球类 - By: zyb - 周日 2月 13 2022
 """
 import image
-from data import setData
+from data import set_data
 from utils import color_type, color_threshold, find_max_blob
 
 
-class Ball():
+class Detect_ball():
     def __init__(self):
         self.color_type = None
         self.exists = False
@@ -59,36 +59,41 @@ class Ball():
             else:
                 continue
         if g == 0 and r == 0 and b == 0:
-            return None
+            return False
+
         if g >= b and g >= r:
             self.color_type = color_type["green"]  # 判断为绿球
             self.exists = True
-            setData(1, 'ball')
+            set_data(1, 'ball')
             print("green ball")
+            return True
         elif r >= g and r >= b:
             self.color_type = color_type["red"]  # 判断为红球
             self.exists = True
-            setData(1, 'ball')
+            set_data(1, 'ball')
             print("red ball")
+            return True
         elif b >= g and b >= r:
             self.color_type = color_type["brown"]  # 判断为棕球
             self.exists = True
-            setData(1, 'ball')
+            set_data(1, 'ball')
             print("brown ball")
+            return True
         else:
             self.color_type = None  # 判断失败
             self.exists = False
+            return False
 
     def send_ball(self):
         """" 上层接口，发送球，reset该类 """
         if self.color_type == color_type["green"]:
-            setData(1, 'isOpen')
+            set_data(1, 'isOpen')
             self.ball_reset()
         elif self.color_type == color_type["red"]:
-            setData(1, 'isOpen')
+            set_data(1, 'isOpen')
             self.ball_reset()
         elif self.color_type == color_type["brown"]:
-            setData(1, 'isOpen')
+            set_data(1, 'isOpen')
             self.ball_reset()
 
     def ball_reset(self):

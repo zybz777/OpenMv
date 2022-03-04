@@ -1,7 +1,7 @@
 """重构 赛道颜色检测类 - By: zyb - 周日 2月 13 2022
 """
 import image
-from data import setData
+from data import set_data
 from utils import color_type, color_threshold, find_max_blob
 
 
@@ -25,14 +25,14 @@ class Detect_color():
         if blobs is None:
             self.color_type = None
             self.color_exist = False
-            return self.color_type, self.color_exist  # 失败退出
+            return None, False  # 失败退出
 
         # 颜色提取
         blob = find_max_blob(blobs)  # 最大色块
         if blob is None:
             self.color_type = None
             self.color_exist = False
-            return self.color_type, self.color_exist  # 失败退出
+            return None, False  # 失败退出
 
         s = blob.w() * blob.h()  # 距离依据
         # 滤波操作 匹配赛道颜色块
@@ -45,7 +45,7 @@ class Detect_color():
             if ratio < 3:
                 self.color_type = None
                 self.color_exist = False
-                return self.color_type, self.color_exist  # 失败退出
+                return None, False  # 失败退出
         else:
             s_max = 20000
             s_min = 100
@@ -60,16 +60,16 @@ class Detect_color():
             # print(color_input)
             self.color_type = color_type[color_input]
             self.color_exist = True
-            return self.color_type, self.color_exist  # 成功判断
+            return self.color_type, True  # 成功判断
 
     def color_send(self, img, color_input):
         """ 识别颜色并发送数据
             成功, 返回True
-            失败，返回False
+            失败, 返回False
         """
         self.judge_choose_color(img, color_input)
-        if self.color_exist:
-            setData(self.color_type, 'color')
+        if self.color_exist is True:
+            set_data(self.color_type, 'color')
             self.color_reset()
             return True
         else:
@@ -77,6 +77,8 @@ class Detect_color():
             return False
 
     def color_reset(self):
+        """归零颜色信号
+        """
         self.color_type = None  # reset
         self.color_exist = False  #
         # 状态复位 临近终点，准备再次录入小球

@@ -1,6 +1,5 @@
 # 主函数 - By: zyb - 周一 10月 25 2021
 import sensor, image, time
-import lineDef as LD
 import data as DA
 import pyb
 from pyb import Pin, Timer, LED
@@ -24,28 +23,13 @@ LED(2).off()  # openmv启动完成
 while True:
     clock.tick()
     img = sensor.snapshot()
-    """ ------颜色检测------- """
-    # """
-    my_way.state_exe(img)
-    # """
-    """ ------功能检测------ """
-    # light.pulse_width_percent(1)
-    # CD.colorSend(img, 'blue')
-    # CD.colorSend(img, 'green')
-    # CD.colorSend(img, 'yellow')
-    # CD.colorSend(img, 'red')
-    # CD.colorSend(img, 'brown')
-    # light.pulse_width_percent(1) # 控制亮度 0~100
-    # CD.ballRecog(img)
-    """ ------赛道检测------ """
-    # pyb.LED(1).on()
-    # pyb.LED(2).on()
-    # pyb.LED(3).on()
-    # CD.ballRecog(img)
-    # CD.colorSend(img, 'green')
-    # LD.line_track(img.copy())
-    # print(LD.line_track(img))
+    """ ------状态机------- """
+    # my_way.state_exe(img)  # 颜色信息
+    # my_way.line_track(img.copy())
+    """ ------测试------ """
+    # my_way.my_ball.detect_ball(img)
+    # my_way.my_color.color_send(img, 'green')
     """ ------数据发送------ """
-    DA.sendData()
-    DA.clearData()
+    DA.send_data()
+    DA.clear_data()
     # print(clock.fps()) # 显示FPS

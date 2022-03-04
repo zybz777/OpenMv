@@ -12,46 +12,52 @@ angle = 0
 isOpen = 0
 ball = 0
 end = 0x5B
+datasets = {
+    'header1': 0x2C,
+    'header2': 8,
+    'color': 0,
+    'direction': 0,
+    'angle': 0,
+    'isOpen': 0,
+    'ball': 0,
+    'end': 0x5B
+}
 
 
-def setData(data, target):
-    """ 写入数据 """
-    global color
-    global direction
-    global angle
-    global isOpen
-    global ball
+def set_data(data, target):
+    """写入待发送数据
 
-    if target == 'color':
-        color = data
-    elif target == 'direction':
-        direction = data
-    elif target == 'angle':
-        angle = data
-    elif target == 'isOpen':
-        isOpen = data
-    elif target == 'ball':
-        ball = data
+    Args:
+        data (_type_): 要发送的数据
+        target (str): 对用的位置, 查看datasets的具体定义
+    """
+    global datasets
+    datasets[target] = data
 
 
-def clearData():
+def clear_data():
     """ 数据复位 """
-    global color
-    global direction
-    global angle
-    global isOpen
-    global ball
+    global datasets
 
-    color = 0
-    direction = 0
-    angle = 0
-    isOpen = 0
-    ball = 0
+    datasets['color'] = 0
+    datasets['direction'] = 0
+    datasets['angle'] = 0
+    datasets['isOpen'] = 0
+    datasets['ball'] = 0
 
 
-def sendData():
+def send_data():
     """ 数据发送 """
-    allData = [header1, header2, color, direction, angle, isOpen, ball, end]
+    allData = []
+    for data in datasets.values():
+        allData.append(data)
     # print(allData)
     datas = bytearray(allData)
     uart.write(datas)
+
+
+def reveive_data():
+    info = None
+    if uart.any():
+        info = uart.readline().decode()
+    return info
