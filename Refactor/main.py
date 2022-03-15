@@ -24,12 +24,13 @@ while True:
     clock.tick()
     img = sensor.snapshot()
     """ ------状态机------- """
-    # my_way.state_exe(img)  # 颜色信息
+    my_way.state_exe(img)  # 颜色信息
     # my_way.line_track(img.copy())
     """ ------测试------ """
     # my_way.my_ball.detect_ball(img)
     # my_way.my_color.color_send(img, 'green')
     """ ------数据发送------ """
     DA.send_data()
+    #print(DA.datasets)
     DA.clear_data()
     # print(clock.fps()) # 显示FPS

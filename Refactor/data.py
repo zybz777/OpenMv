@@ -4,23 +4,23 @@ from pyb import UART
 uart = UART(3, 115200)
 uart.init(115200, bits=8, parity=None, stop=1)  # 8位数据位，无校验位，1位停止位
 """ ------ 数据定义 全局变量 ------ """
-header1 = 0x2C
+header1 = 100
 header2 = 8
 color = 0
 direction = 0
 angle = 0
 isOpen = 0
 ball = 0
-end = 0x5B
+end = 101
 datasets = {
-    'header1': 0x2C,
+    'header1': 100,
     'header2': 8,
     'color': 0,
     'direction': 0,
     'angle': 0,
     'isOpen': 0,
     'ball': 0,
-    'end': 0x5B
+    'end': 101
 }
 
 
@@ -49,15 +49,24 @@ def clear_data():
 def send_data():
     """ 数据发送 """
     allData = []
-    for data in datasets.values():
-        allData.append(data)
-    # print(allData)
+    #for data in datasets.values():
+        #allData.append(data)
+    allData.append(datasets['header1'])
+    allData.append(datasets['header2'])
+    allData.append(datasets['color'])
+    allData.append(datasets['direction'])
+    allData.append(datasets['angle'])
+    allData.append(datasets['isOpen'])
+    allData.append(datasets['ball'])
+    allData.append(datasets['end'])
+    #print(allData)
     datas = bytearray(allData)
     uart.write(datas)
 
 
 def reveive_data():
-    info = None
+    info = '0'
     if uart.any():
         info = uart.readline().decode()
     return info
+

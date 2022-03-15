@@ -87,9 +87,10 @@ class Runway():
         """ 状态转移函数 """
         global flag_grass
         info = reveive_data()  # stm32 返回数据
+        print(info)
         # state 1
         if self.current_state == statesets["state_1_start"]:
-            if info == '1':
+            if '1' in info:
                 self.current_state = statesets["state_2_load"]  # 状态切换
 
                 change_symbol('state_2_load')
