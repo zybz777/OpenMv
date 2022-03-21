@@ -80,10 +80,10 @@ class Detect_color():
         self.judge_choose_color(img, color_input)
         if self.color_exist is True:
             set_data(self.color_type, 'color')
-            self.color_reset()
+            self.color_reset() # 状态复位
             return True
         else:
-            self.color_reset()
+            self.color_reset() # 状态复位
             return False
 
     def color_reset(self):

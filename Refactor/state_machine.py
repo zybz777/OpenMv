@@ -87,7 +87,7 @@ class Runway():
         """ 状态转移函数 """
         global flag_grass
         info = reveive_data()  # stm32 返回数据
-        print(info)
+        #print(info)
         # state 1
         if self.current_state == statesets["state_1_start"]:
             if '1' in info:
@@ -98,7 +98,7 @@ class Runway():
 
         # state 2
         elif self.current_state == statesets["state_2_load"]:
-            if info == '2':
+            if '2' in info:
                 self.current_state = statesets["state_3_user1"]  # 状态切换
 
                 change_symbol('state_3_user1')
@@ -107,26 +107,26 @@ class Runway():
         # state 3
         elif self.current_state == statesets["state_3_user1"]:
 
-            if info == '3':
+            if '3' in info:
                 self.current_state = statesets["state_4_stair"]  # 状态切换
                 change_symbol('state_4_stair', 4)
 
         # state 4
         elif self.current_state == statesets["state_4_stair"]:
-            if info == '4':
+            if '4' in info:
                 self.current_state = statesets["state_5_user2"]  # 状态切换
                 change_symbol('state_5_user2', 4)
 
         # state 5
         elif (self.current_state == statesets["state_5_user2"]):
-            if info == '5':
+            if '5' in info:
                 self.current_state = statesets["state_6_grass"]  # 状态切换
                 change_symbol('state_6_grass', 1)
                 light.pulse_width_percent(100)  # 打开补光版，草地用
 
         # state 6
         elif self.current_state == statesets["state_6_grass"]:
-            if info == '6':
+            if '6' in info:
                 self.current_state = statesets["state_7_user3"]  # 状态切换
                 light.pulse_width_percent(0)  # 关闭补光版
                 flag_grass = 0
@@ -134,7 +134,7 @@ class Runway():
 
         # state 7
         elif self.current_state == statesets["state_7_user3"]:
-            if info == '7':
+            if '7' in info:
                 self.current_state = statesets["state_1_start"]  # 状态切换
                 change_symbol('state_1_start', 1)
 
