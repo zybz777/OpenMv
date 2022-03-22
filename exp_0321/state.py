@@ -21,7 +21,9 @@ class State_Machine():
                 img = sensor.snapshot()
                 self.FLAG_START = self.find_starting_point(img)  # 找到起点， 发送消息
                 my_uart.send_data()  # 发送该颜色信息
+                #print(my_uart.datasets)
                 info = my_uart.reveive_data()
+                #print('1 starting point info', info)
                 my_uart.clear_data()
                 # 接收狗子信息， 退出该状态
                 if '1' in info:
@@ -37,6 +39,8 @@ class State_Machine():
                 self.find_ball(img)  # 识别球
                 my_uart.send_data()  # 发送该颜色信息
                 info = my_uart.reveive_data()
+                #print('ball info', info)
+                #print(my_uart.datasets['ball'])
                 my_uart.clear_data()
                 # 接收狗子信息， 退出该状态
                 if '2' in info:
@@ -50,7 +54,8 @@ class State_Machine():
 
         # 找用户, 依托于球判断准确，只会在球对应颜色用户区停车
         flag_user = self.find_user(img)
-        if flag_user is True:
+        if flag_user is True and (self.FLAG_BALL_TYPE['RED'] is True or self.FLAG_BALL_TYPE['BROWN'] is True
+                                  or self.FLAG_BALL_TYPE['PRUPLE'] is True):
             while True:
                 img = sensor.snapshot()
                 self.find_user(img)
@@ -64,7 +69,7 @@ class State_Machine():
                     self.FLAG_BALL_TYPE['RED'] = False
                     self.FLAG_BALL_TYPE['BROWN'] = False
                     self.FLAG_BALL_TYPE['PRUPLE'] = False
-
+                    break
         # 找障碍
         flag_upstair = self.find_yellow_upstair(img)  # 障碍1
         if flag_upstair is True:
@@ -119,7 +124,12 @@ class State_Machine():
         # 识别成功
         if self.FLAG_BALL_TYPE['RED'] is True or self.FLAG_BALL_TYPE['PRUPLE'] is True or self.FLAG_BALL_TYPE['BROWN'] is True:
             my_uart.set_data(1, 'ball')  # 检测到球
-            print("找到球")
+            if self.FLAG_BALL_TYPE['PRUPLE'] is True:
+                print("找到紫球")
+            elif self.FLAG_BALL_TYPE['BROWN'] is True:
+                print("找到棕球")
+            elif self.FLAG_BALL_TYPE['RED'] is True:
+                print("找到红球")
         # 识别失败
         else:
             my_uart.set_data(0, 'ball')
@@ -139,18 +149,21 @@ class State_Machine():
             FLAG_USER1 = detect_user(img, 1)
             if FLAG_USER1 is True:
                 my_uart.set_data(1, 'isOpen')  # 开舱门 user1
+                my_uart.set_data(COLOR['RED'], 'color')  # 开舱门 user1
                 print('找到红色用户')
                 return True
         elif self.FLAG_BALL_TYPE['BROWN'] is True:
             FLAG_USER2 = detect_user(img, 2)
             if FLAG_USER2 is True:
                 my_uart.set_data(1, 'isOpen')  # 开舱门 user2
+                my_uart.set_data(COLOR['BROWN'], 'color')  # 开舱门 user1
                 print('找到棕色用户')
                 return True
         elif self.FLAG_BALL_TYPE['PRUPLE'] is True:
             FLAG_USER3 = detect_user(img, 3)
             if FLAG_USER3 is True:
                 my_uart.set_data(1, 'isOpen')  # 开舱门 user3
+                my_uart.set_data(COLOR['PRUPLE'], 'color')  # 开舱门 user1
                 print('找到紫色用户')
                 return True
         # 识别失败

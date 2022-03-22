@@ -27,5 +27,6 @@ while True:
 
     # 串口发送
     my_uart.send_data()
+    #print(my_uart.datasets)
     my_uart.clear_data()
-    # print(clock.fps())  # 显示FPS
+    #print(clock.fps())  # 显示FPS
