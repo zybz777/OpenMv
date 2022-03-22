@@ -67,6 +67,34 @@ def detect_blue_start_point(img):
     return True
 
 
+def detect_user(img, id: int):
+    ID_dict = {'1': 'RED', '2': 'BROWN', '3': 'PRUPLE'}
+    ROI = (0, 40, 80, 20)  # 下 1/3 屏幕
+    Area_th = int((ROI[2] * ROI[3]) / 4)  # ROI 区域的 1/4
+    blobs = img.find_blobs(COLOR_THRESHOLD[ID_dict[str(id)]], merge=True, area_threshold=Area_th, margin=10, roi=ROI, x_stride=40, y_stride=6)
+    # exit 1
+    if blobs is None:
+        return False
+
+    blob = get_max_blob(blobs)
+    # exit 2
+    if blob is None:
+        return False
+
+    x, y, w, h = blob.cx(), blob.cy(), blob.w(), blob.h()
+    # print(x, y, w, h) # display [x y w h]
+    # print('Area', w * h)  # display area
+    ratio = round(w / h, 2)
+    ratio_limit = 2  # TODO: 需要赛道实测，先给出一个大概值
+    # exit 3
+    if ratio < ratio_limit:
+        return False
+
+    # print("ratio", round(w / h, 2))  # display ratio
+    img.draw_rectangle(blob.rect())
+    return True
+
+
 def get_max_blob(blobs):
     """根据色块列表寻找最大色块
 

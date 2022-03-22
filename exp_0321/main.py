@@ -5,7 +5,7 @@ from pyb import Pin, Timer, LED
 # user add
 from color_detect import detect_black_obstacle, detect_blue_start_point
 from ball_detect import detect_ball
-import state
+from state import state_machine
 from uart import my_uart
 # from state_machine import Runway
 """    初始化openmv     """
@@ -19,16 +19,12 @@ sensor.set_auto_whitebal(False)
 LED(2).off()  # openmv启动完成
 clock = time.clock()
 """    主循环    """
-# TODO: 1. 测试重构后的bug；2. stm32 给 openmv 串口发送信息，形成闭环
 while True:
     clock.tick()
     img = sensor.snapshot()
     """ ------状态机------- """
-    state.find_starting_point(img)
-    if detect_ball(img, 'RED') is True:
-        print("红球")
-    if detect_ball(img, 'PRUPLE') is True:
-        print("紫球")
+    state_machine.run(img)
+
     # 串口发送
     my_uart.send_data()
     my_uart.clear_data()

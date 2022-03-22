@@ -22,11 +22,7 @@ class Detect_color():
             _type_: self.color_type, self.color_exist
         """
         self.color_type = color_type[color_input]  # 接收输入
-        blobs = img.find_blobs(color_threshold[color_input]['threshold'],
-                               merge=True,
-                               pixels_threshold=1,
-                               area_threshold=1,
-                               margin=10)  # 搜索输入色块
+        blobs = img.find_blobs(color_threshold[color_input]['threshold'], merge=True, pixels_threshold=1, area_threshold=1, margin=10)  # 搜索输入色块
         if blobs is None:
             self.color_type = None
             self.color_exist = False
@@ -57,11 +53,7 @@ class Detect_color():
         # 滤波后输出结果
         if s_min < s and s < s_max:  # 绿色100
             img.draw_rectangle(blob.rect())
-            img.draw_string(blob.cx(),
-                            blob.cy(),
-                            color_input,
-                            scale=1,
-                            mono_space=False)
+            img.draw_string(blob.cx(), blob.cy(), color_input, scale=1, mono_space=False)
             # print(color_input)
             self.color_type = color_type[color_input]
             self.color_exist = True
@@ -80,10 +72,10 @@ class Detect_color():
         self.judge_choose_color(img, color_input)
         if self.color_exist is True:
             set_data(self.color_type, 'color')
-            self.color_reset() # 状态复位
+            self.color_reset()  # 状态复位
             return True
         else:
-            self.color_reset() # 状态复位
+            self.color_reset()  # 状态复位
             return False
 
     def color_reset(self):

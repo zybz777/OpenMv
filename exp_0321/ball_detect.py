@@ -3,6 +3,15 @@ from color_detect import get_max_blob
 
 
 def detect_ball(img, input_color):
+    """detect_ball _summary_
+
+    Args:
+        img (_type_): _description_
+        input_color (_type_): _description_
+
+    Returns:
+        Bool: True or False
+    """
     ROI = (0, 20, 80, 40)  # 下 2/3 屏幕
     blobs = img.find_blobs(COLOR_THRESHOLD[input_color], merge=True, margin=10, roi=ROI, x_stride=5, y_stride=5)
     if blobs is None:
@@ -19,3 +28,5 @@ def detect_ball(img, input_color):
     if ratio_limit[0] < ratio and ratio < ratio_limit[1]:
         img.draw_rectangle(blob.rect())
         return True
+    else:
+        return False
