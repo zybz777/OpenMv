@@ -27,6 +27,7 @@ def detect_ball(img, input_color):
 
     if ratio_limit[0] < ratio and ratio < ratio_limit[1]:
         img.draw_rectangle(blob.rect())
+        img.draw_string(x, y, input_color, color=(255, 255, 255))
         return True
     else:
         return False
