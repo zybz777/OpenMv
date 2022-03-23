@@ -16,14 +16,14 @@ class State_Machine():
 
     def run(self, img):
         # 找起点
-        if self.FLAG_START is False:
+        if self.FLAG_START is False and self.find_starting_point(img) is True:
             while True:
                 img = sensor.snapshot()
                 self.FLAG_START = self.find_starting_point(img)  # 找到起点， 发送消息
                 my_uart.send_data()  # 发送该颜色信息
-                #print(my_uart.datasets)
+                # print(my_uart.datasets)
                 info = my_uart.reveive_data()
-                #print('1 starting point info', info)
+                # print('1 starting point info', info)
                 my_uart.clear_data()
                 # 接收狗子信息， 退出该状态
                 if '1' in info:
