@@ -7,12 +7,104 @@ from uart import my_uart
 from utils import COLOR
 import sensor
 
+STATE = {
+    'state_1_begin': 1,
+    'state_recognize_ball': 2,
+    'state_2_user1': 3,
+    'state_3_yellow_climb': 4,
+    'state_4_black_obstacle': 5,
+    'state_5_user2': 6,
+    'state_6_grass': 7,
+    'state_7_user3': 8,
+    'state_debug': 9
+}
+
 
 # TODO：依托于颜色判断很准才可以
 class State_Machine():
     def __init__(self):
         self.FLAG_BALL_TYPE = {'RED': False, 'BROWN': False, 'PRUPLE': False}  # 三球状态位
         self.FLAG_START = False  # TODO：识别到起点后变为True, 走到用户区成功送球复位
+        self.state = STATE['state_1_begin']
+
+    def state_machine_exe(self, img):
+        if self.state == STATE['state_1_begin']:
+            # flag1 = self.find_starting_point(img)
+            if self.find_starting_point(img) is True:
+                my_uart.send_data()  # 发送蓝色
+                my_uart.clear_data()
+                self.state_trans(STATE['state_recognize_ball'])
+            else:
+                pass
+            """ 识别球 """
+        elif self.state == STATE['state_recognize_ball']:
+            if self.find_ball(img) is True:  # 识别球
+                my_uart.send_data()  # 发送球和球颜色
+                my_uart.clear_data()
+                self.state_trans(STATE['state_2_user1'])
+            else:
+                pass
+            """ 到达用户1区域 """
+        elif self.state == STATE['state_2_user1']:
+            if self.find_user(img, 1) is True:
+                my_uart.send_data()  # 发送球和球颜色
+                my_uart.clear_data()
+                self.state_trans(STATE['state_3_yellow_climb'])
+            else:
+                pass
+            """ 准备上台阶  """
+        elif self.state == STATE['state_3_yellow_climb']:
+            if self.find_yellow_upstair(img) is True:
+                my_uart.send_data()  # 发送球和球颜色
+                my_uart.clear_data()
+                self.state_trans(STATE['state_4_black_obstacle'])
+            else:
+                pass
+            """ 准备绕柱子  """
+        elif self.state == STATE['state_4_black_obstacle']:
+            if self.find_bucket_obstacles(img) is True:
+                my_uart.send_data()  # 发送球和球颜色
+                my_uart.clear_data()
+                self.state_trans(STATE['state_5_user2'])
+            else:
+                pass
+            """ 到达用户2区域 """
+        elif self.state == STATE['state_5_user2']:
+            if self.find_user(img, 2) is True:
+                my_uart.send_data()  # 发送球和球颜色
+                my_uart.clear_data()
+                self.state_trans(STATE['state_6_grass'])
+            else:
+                pass
+        else:
+            pass
+        pass
+
+    def state_trans(self, st):
+        info = my_uart.reveive_data()
+        if st == STATE['state_recognize_ball']:
+            if '1' in info:
+                self.state = st  # 状态转移成功
+                print("准备接收球")
+        elif st == STATE['state_2_user1']:
+            if '2' in info:
+                self.state = st  # 状态转移成功
+                print('准备检测用户1')
+        elif st == STATE['state_3_yellow_climb']:
+            if '3' in info:
+                self.state = st  # 状态转移成功
+                print('准备上台阶')
+        elif st == STATE['state_4_black_obstacle']:
+            if '4' in info:
+                self.state = st  # 状态转移成功
+                print('准备绕过柱子')
+        elif st == STATE['state_5_user2']:
+            if '5' in info:
+                self.state = st  # 状态转移成功
+                print('准备检测用户2')
+        else:
+            pass
+        pass
 
     def run(self, img):
         # 找起点
@@ -110,13 +202,13 @@ class State_Machine():
         return True
 
     def find_ball(self, img):
-        """find_ball 找三个球，将颜色信息存储到 FLAG_BALL_TYPE 中， 串口发送是否有球
+        """find_ball 找三个球，将颜色信息存储到 FLAG_BALL_TYPE 中， 串口发送球和球的颜色
 
         Args:
             img (_type_): _description_
 
         Returns:
-            _type_: _description_
+            Bool: True of False
         """
         self.FLAG_BALL_TYPE['RED'] = detect_ball(img, 'RED')
         self.FLAG_BALL_TYPE['PRUPLE'] = detect_ball(img, 'PRUPLE')
@@ -125,49 +217,29 @@ class State_Machine():
         if self.FLAG_BALL_TYPE['RED'] is True or self.FLAG_BALL_TYPE['PRUPLE'] is True or self.FLAG_BALL_TYPE['BROWN'] is True:
             my_uart.set_data(1, 'ball')  # 检测到球
             if self.FLAG_BALL_TYPE['PRUPLE'] is True:
+                my_uart.set_data(COLOR['PRUPLE'], 'color')
                 print("找到紫球")
             elif self.FLAG_BALL_TYPE['BROWN'] is True:
+                my_uart.set_data(COLOR['BROWN'], 'color')
                 print("找到棕球")
             elif self.FLAG_BALL_TYPE['RED'] is True:
+                my_uart.set_data(COLOR['RED'], 'color')
                 print("找到红球")
+            return True
         # 识别失败
         else:
             my_uart.set_data(0, 'ball')
-        return self.FLAG_BALL_TYPE
+            return False
 
-    def find_user(self, img):
-        """find_user  判断三位用户哪位需要投递球， 串口发送消息
-
-        Args:
-            img (_type_): _description_
-
-        Returns:
-            _type_: _description_
-        """
-        # 根据球的颜色信息寻找对应, 状态为为临时变量 不需要复位
-        if self.FLAG_BALL_TYPE['RED'] is True:
-            FLAG_USER1 = detect_user(img, 1)
-            if FLAG_USER1 is True:
-                my_uart.set_data(1, 'isOpen')  # 开舱门 user1
-                my_uart.set_data(COLOR['RED'], 'color')  # 开舱门 user1
-                print('找到红色用户')
-                return True
-        elif self.FLAG_BALL_TYPE['BROWN'] is True:
-            FLAG_USER2 = detect_user(img, 2)
-            if FLAG_USER2 is True:
-                my_uart.set_data(1, 'isOpen')  # 开舱门 user2
-                my_uart.set_data(COLOR['BROWN'], 'color')  # 开舱门 user1
-                print('找到棕色用户')
-                return True
-        elif self.FLAG_BALL_TYPE['PRUPLE'] is True:
-            FLAG_USER3 = detect_user(img, 3)
-            if FLAG_USER3 is True:
-                my_uart.set_data(1, 'isOpen')  # 开舱门 user3
-                my_uart.set_data(COLOR['PRUPLE'], 'color')  # 开舱门 user1
-                print('找到紫色用户')
-                return True
-        # 识别失败
-        return False
+    def find_user(self, img, id: int):
+        id_list = {'1': 'RED', '2': 'BROWN', '3': 'RUPLE'}
+        if detect_user(img, id) is True:
+            # my_uart.set_data(1, 'isOpen')  # 开舱门 user1
+            my_uart.set_data(COLOR[id_list[str(id)]], 'color')  # 开舱门 user1
+            print('到达用户' + str(id) + '区域')
+            return True
+        else:
+            return False
 
     def find_yellow_upstair(self, img):
         # 黑色提示
@@ -192,6 +264,12 @@ class State_Machine():
 
     def find_bucket_obstacles(self, img):
         # TODO: 需要根据白线转向
+        FLAG_BALCK = detect_black_obstacle(img)
+        if FLAG_BALCK is not True:
+            return False
+        print('到达桶装障碍物')
+        my_uart.set_data(COLOR['BUCKET'], 'color')
+        return True
         pass
 
 

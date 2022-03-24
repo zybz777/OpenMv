@@ -16,4 +16,5 @@ COLOR = {
     'BROWN': 4,
     'GREEN': 5,
     'PRUPLE': 6,
+    'BUCKET': 7,
 }

@@ -23,7 +23,7 @@ while True:
     clock.tick()
     img = sensor.snapshot()
     """ ------状态机------- """
-    state_machine.run(img)
+    state_machine.state_machine_exe(img)
 
     # 串口发送
     my_uart.send_data()
