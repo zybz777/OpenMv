@@ -6,14 +6,14 @@ from utils import COLOR_THRESHOLD, COLOR
 """
 
 
-def detect_black_obstacle(img):
+def detect_black_obstacle(img, ROI=(0, 30, 80, 30)):
     """detect_color
 
     Args:
         img (img): img
         input_color (str): BLACK, BLUE etc.
     """
-    ROI = (0, 30, 80, 30)  # 下 1/2 屏幕
+    #ROI = (0, 30, 80, 30)  # 下 1/2 屏幕
     Area_th = int((ROI[2] * ROI[3]) / 4)  # ROI 区域的 1/4
     blobs = img.find_blobs(COLOR_THRESHOLD['BLACK'], merge=True, area_threshold=Area_th, margin=20, roi=ROI, x_stride=40, y_stride=6)
     # exit 1

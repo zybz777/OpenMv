@@ -3,8 +3,9 @@ import sensor, image, time
 # import data as DA
 from pyb import Pin, Timer, LED
 # user add
-from color_detect import detect_black_obstacle, detect_blue_start_point
+from color_detect import detect_black_obstacle, detect_blue_start_point, detect_user
 from ball_detect import detect_ball
+from line_detect import my_line
 from state import state_machine
 from uart import my_uart
 # from state_machine import Runway
@@ -23,10 +24,13 @@ while True:
     clock.tick()
     img = sensor.snapshot()
     """ ------状态机------- """
-    state_machine.state_machine_exe(img)
+    # state_machine.state_machine_exe(img)
+    # my_line.line_track(img)
+    #state_machine.find_user(img, 3)
+    #detect_user(img, 3)
 
     # 串口发送
-    my_uart.send_data()
+    #my_uart.send_data()
     #print(my_uart.datasets)
-    my_uart.clear_data()
+    #my_uart.clear_data()
     #print(clock.fps())  # 显示FPS

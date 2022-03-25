@@ -76,9 +76,24 @@ class State_Machine():
                 self.state_trans(STATE['state_6_grass'])
             else:
                 pass
+            """ 到达草地 """
+        elif self.state == STATE['state_6_grass']:
+            if self.find_grass(img) is True:
+                my_uart.send_data()
+                my_uart.clear_data()
+                self.state_trans(STATE['state_7_user3'])
+            else:
+                pass
+            """ 到达用户3区域 """
+        elif self.state == STATE['state_7_user3']:
+            if self.find_user(img, 3) is True:
+                my_uart.send_data()  # 发送球和球颜色
+                my_uart.clear_data()
+                self.state_trans(STATE['state_1_begin'])
+            else:
+                pass
         else:
             pass
-        pass
 
     def state_trans(self, st):
         info = my_uart.reveive_data()
@@ -102,84 +117,23 @@ class State_Machine():
             if '5' in info:
                 self.state = st  # 状态转移成功
                 print('准备检测用户2')
+        elif st == STATE['state_6_grass']:
+            if '6' in info:
+                self.state = st
+                print('准备检测草地')
+        elif st == STATE['state_7_user3']:
+            if '7' in info:
+                self.state = st
+                print('准备检测用户3')
+        elif st == STATE['state_1_begin']:
+            if '8' in info:
+                self.state = st
+                print('准备检测起点')
         else:
             pass
-        pass
-
-    def run(self, img):
-        # 找起点
-        if self.FLAG_START is False and self.find_starting_point(img) is True:
-            while True:
-                img = sensor.snapshot()
-                self.FLAG_START = self.find_starting_point(img)  # 找到起点， 发送消息
-                my_uart.send_data()  # 发送该颜色信息
-                # print(my_uart.datasets)
-                info = my_uart.reveive_data()
-                # print('1 starting point info', info)
-                my_uart.clear_data()
-                # 接收狗子信息， 退出该状态
-                if '1' in info:
-                    self.FLAG_START = True
-                    print("准备接收球")
-                    break
-
-        # 找球, 依托于起点识别
-        if self.FLAG_START is True and (self.FLAG_BALL_TYPE['RED'] is False and self.FLAG_BALL_TYPE['BROWN'] is False
-                                        and self.FLAG_BALL_TYPE['PRUPLE'] is False):
-            while True:
-                img = sensor.snapshot()
-                self.find_ball(img)  # 识别球
-                my_uart.send_data()  # 发送该颜色信息
-                info = my_uart.reveive_data()
-                #print('ball info', info)
-                #print(my_uart.datasets['ball'])
-                my_uart.clear_data()
-                # 接收狗子信息， 退出该状态
-                if '2' in info:
-                    if self.FLAG_BALL_TYPE['RED'] is True:
-                        print("红球接收完毕")
-                    if self.FLAG_BALL_TYPE['BROWN'] is True:
-                        print("棕球接收完毕")
-                    if self.FLAG_BALL_TYPE['PRUPLE'] is True:
-                        print("紫球接收完毕")
-                    break
-
-        # 找用户, 依托于球判断准确，只会在球对应颜色用户区停车
-        flag_user = self.find_user(img)
-        if flag_user is True and (self.FLAG_BALL_TYPE['RED'] is True or self.FLAG_BALL_TYPE['BROWN'] is True
-                                  or self.FLAG_BALL_TYPE['PRUPLE'] is True):
-            while True:
-                img = sensor.snapshot()
-                self.find_user(img)
-                my_uart.send_data()  # 发送该颜色信息
-                info = my_uart.reveive_data()
-                my_uart.clear_data()
-                # 接收狗子信息， 退出该状态
-                if '3' in info:
-                    print("快递球投递成功")
-                    self.FLAG_START = False  # 球已送达，复位起点状态
-                    self.FLAG_BALL_TYPE['RED'] = False
-                    self.FLAG_BALL_TYPE['BROWN'] = False
-                    self.FLAG_BALL_TYPE['PRUPLE'] = False
-                    break
-        # 找障碍
-        flag_upstair = self.find_yellow_upstair(img)  # 障碍1
-        if flag_upstair is True:
-            while True:
-                img = sensor.snapshot()
-                self.find_yellow_upstair(img)
-                my_uart.send_data()  # 发送该颜色信息
-                info = my_uart.reveive_data()
-                my_uart.clear_data()
-                if '4' in info:
-                    print("到达上台阶")
-                    break
-
-        self.find_bucket_obstacles(img)  # 障碍2
-        self.find_grass(img)  # 障碍3
 
     def find_starting_point(self, img):
-        """find starting point and set uart data
+        """识别起点 黑+蓝
 
         Args:
             img (img): img
@@ -202,7 +156,7 @@ class State_Machine():
         return True
 
     def find_ball(self, img):
-        """find_ball 找三个球，将颜色信息存储到 FLAG_BALL_TYPE 中， 串口发送球和球的颜色
+        """识别三颜色的球
 
         Args:
             img (_type_): _description_
@@ -232,7 +186,16 @@ class State_Machine():
             return False
 
     def find_user(self, img, id: int):
-        id_list = {'1': 'RED', '2': 'BROWN', '3': 'RUPLE'}
+        """find_user 识别用户颜色 红、棕、紫
+
+        Args:
+            img (_type_): _description_
+            id (int): 用户序号
+
+        Returns:
+            Bool: True of False
+        """
+        id_list = {'1': 'RED', '2': 'BROWN', '3': 'PRUPLE'}
         if detect_user(img, id) is True:
             # my_uart.set_data(1, 'isOpen')  # 开舱门 user1
             my_uart.set_data(COLOR[id_list[str(id)]], 'color')  # 开舱门 user1
@@ -242,6 +205,14 @@ class State_Machine():
             return False
 
     def find_yellow_upstair(self, img):
+        """find_yellow_upstair 识别楼梯 黑+黄
+
+        Args:
+            img (_type_): _description_
+
+        Returns:
+            Bool: True or False
+        """
         # 黑色提示
         FLAG_BALCK = detect_black_obstacle(img)
         if FLAG_BALCK is not True:
@@ -256,21 +227,38 @@ class State_Machine():
         return True
 
     def find_grass(self, img):
+        """find_grass 识别草地
+
+        Args:
+            img (_type_): _description_
+
+        Returns:
+            Bool: True or False
+        """
         # TODO： 切换步态？ 需要开补光灯
         FLAG_GRASS = detect_grass(img)
         if FLAG_GRASS is True:
             my_uart.set_data(COLOR['GREEN'], 'color')
             print('到达草地')
+            return True
+        return False
 
     def find_bucket_obstacles(self, img):
+        """find_bucket_obstacles 识别桶状障碍物
+
+        Args:
+            img (_type_): _description_
+
+        Returns:
+            Bool: True of False
+        """
         # TODO: 需要根据白线转向
-        FLAG_BALCK = detect_black_obstacle(img)
+        FLAG_BALCK = detect_black_obstacle(img, ROI=(0, 0, 80, 20))  # 上半屏幕
         if FLAG_BALCK is not True:
             return False
         print('到达桶装障碍物')
         my_uart.set_data(COLOR['BUCKET'], 'color')
         return True
-        pass
 
 
 state_machine = State_Machine()
