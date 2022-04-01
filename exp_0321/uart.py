@@ -1,11 +1,5 @@
 from pyb import UART
 from utils import COLOR
-# uart init
-# my_uart = UART(3, 115200)
-# my_uart.init(115200, bits=8, parity=None, stop=1)
-
-# define data
-# datasets = {'header1': 100, 'header2': 8, 'color': 0, 'direction': 0, 'angle': 0, 'isOpen': 0, 'ball': 0, 'end': 101}
 
 
 class Uart():
@@ -14,8 +8,8 @@ class Uart():
         self.uart.init(115200, bits=8, parity=None, stop=1)
         self.datasets = {'header1': 100, 'header2': 8, 'color': 0, 'direction': 0, 'angle': 0, 'isOpen': 0, 'ball': 0, 'end': 101}
 
-    def set_data(self, data, target_position):
-        self.datasets[target_position] = data
+    def set_data(self, data_value, data_position):
+        self.datasets[data_position] = data_value
 
     def clear_data(self):
         self.datasets['color'] = 0
@@ -26,6 +20,7 @@ class Uart():
 
     def send_data(self):
         allData = []
+        # for 遍历字典 append 顺序会乱
         allData.append(self.datasets['header1'])
         allData.append(self.datasets['header2'])
         allData.append(self.datasets['color'])

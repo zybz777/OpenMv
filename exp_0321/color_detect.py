@@ -6,14 +6,13 @@ from utils import COLOR_THRESHOLD, COLOR
 """
 
 
-def detect_black_obstacle(img, ROI=(0, 30, 80, 30)):
-    """detect_color
+def detect_black_obstacle(img, ROI=(0, 50, 80, 10)):
+    """detect_color, ROI为下半屏幕, 最低限制为ROI的1/4
 
     Args:
         img (img): img
         input_color (str): BLACK, BLUE etc.
     """
-    #ROI = (0, 30, 80, 30)  # 下 1/2 屏幕
     Area_th = int((ROI[2] * ROI[3]) / 4)  # ROI 区域的 1/4
     blobs = img.find_blobs(COLOR_THRESHOLD['BLACK'], merge=True, area_threshold=Area_th, margin=20, roi=ROI, x_stride=40, y_stride=6)
     # exit 1
@@ -41,9 +40,16 @@ def detect_black_obstacle(img, ROI=(0, 30, 80, 30)):
     return True
 
 
-def detect_blue_start_point(img):
-    ROI = (0, 20, 80, 20)  # 中间 1/3 屏幕
-    Area_th = int((ROI[2] * ROI[3]) / 4)  # ROI 区域的 1/4
+def detect_blue_start_point(img, ROI=(0, 30, 80, 30)):
+    """detect_blue_start_point ROI为中间1/3屏幕, 最低限制为ROI的1/4
+
+    Args:
+        img (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    Area_th = int((ROI[2] * ROI[3]) / 100)  # ROI 区域的 1/4
     blobs = img.find_blobs(COLOR_THRESHOLD['BLUE'], merge=True, area_threshold=Area_th, margin=10, roi=ROI, x_stride=40, y_stride=6)
     # exit 1
     if blobs is None:
@@ -69,9 +75,18 @@ def detect_blue_start_point(img):
     return True
 
 
-def detect_user(img, id: int):
+def detect_user(img, id: int, ROI=(0, 40, 80, 20)):
+    """detect_user ROI为最下1/3屏幕, 最低限制为ROI的1/4
+
+    Args:
+        img (_type_): _description_
+        id (int): _description_
+
+    Returns:
+        _type_: _description_
+    """
     ID_dict = {'1': 'RED', '2': 'BROWN', '3': 'PRUPLE'}
-    ROI = (0, 40, 80, 20)  # 下 1/3 屏幕
+
     Area_th = int((ROI[2] * ROI[3]) / 4)  # ROI 区域的 1/4
     blobs = img.find_blobs(COLOR_THRESHOLD[ID_dict[str(id)]], merge=True, area_threshold=Area_th, margin=10, roi=ROI, x_stride=40, y_stride=6)
     # exit 1
@@ -98,8 +113,15 @@ def detect_user(img, id: int):
     return True
 
 
-def detect_yellow_upstair(img):
-    ROI = (0, 20, 80, 20)  # 中间 1/3 屏幕
+def detect_yellow_upstair(img, ROI=(0, 20, 80, 20)):
+    """detect_yellow_upstair ROI为中间1/3屏幕, 最低限制为ROI的1/4
+
+    Args:
+        img (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     Area_th = int((ROI[2] * ROI[3]) / 4)  # ROI 区域的 1/4
     blobs = img.find_blobs(COLOR_THRESHOLD['YELLOW'], merge=True, area_threshold=Area_th, margin=10, roi=ROI, x_stride=40, y_stride=6)
     # exit 1
@@ -126,8 +148,15 @@ def detect_yellow_upstair(img):
     return True
 
 
-def detect_grass(img):
-    ROI = (0, 20, 80, 40)  # 下 2 /3 屏幕
+def detect_grass(img, ROI=(0, 20, 80, 40)):
+    """detect_grass ROI为下2/3屏幕, 最低限制为ROI的1/4
+
+    Args:
+        img (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     Area_th = int((ROI[2] * ROI[3]) / 4)  # ROI 区域的 1/4
     blobs = img.find_blobs(COLOR_THRESHOLD['GREEN'], merge=True, area_threshold=Area_th, margin=10, roi=ROI, x_stride=40, y_stride=6)
     # exit 1
