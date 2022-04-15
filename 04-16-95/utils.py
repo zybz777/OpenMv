@@ -1,11 +1,12 @@
 COLOR_THRESHOLD = {
-    'BLACK': [(0, 13, -16, 3, 0, 14)],  # version 1
+    'BLACK': [(1, 80, -5, 9, -6, 11)],  # version 1
     'BLUE': [(12, 40, -5, 14, -36, -14)],  # version 3
     'RED': [(21, 39, 11, 59, 3, 37)],  # version 2
-    'YELLOW': [(60, 87, -26, -2, 15, 56)],  # version 2
-    'BROWN': [(11, 43, 11, 32, 4, 33)],  # version 2
-    'GREEN': [(47, 88, -47, -10, 12, 59)],  # version 2
-    'PRUPLE': [(11, 25, 4, 30, -20, 0)]  # version 1
+    'YELLOW': [(57, 99, -26, -2, 10, 52)],  # version 3
+    'BROWN': [(11, 43, 11, 41, 4, 33)],  # version 2
+    'GREEN': [(0, 45, -38, -19, 0, 56)],  # version 2
+    'PRUPLE': [(0, 45, 12, 127, -128, 127)]  # version 1
+
 }
 
 COLOR = {
@@ -20,9 +21,9 @@ COLOR = {
 }
 
 BALL_COLOR_THRESHOLD = {
-    'RED': [(16, 32, 13, 50, 21, 35)],  # version2
-    'BROWN': [(35, 60, 7, 40, 40, 56)], # version3
-    'PRUPLE': [(1, 32, 1, 28, -42, -7)], # verion2
+    'RED': [(29, 57, 34, 127, -128, 127)],  # version2
+    'BROWN': [(30, 65, 10, 38, 22, 127)], # version3
+    'PRUPLE': [(0, 38, 6, 31, -52, -18)], # verion2
 }
 
 STATE = {

@@ -16,6 +16,8 @@ yellow_time = 0
 class State_Machine():
     def __init__(self):
         self.state = STATE['state_1_begin']
+        self.ball_time = 0
+        self.now_time = 0
         self.yellow_time = 0
         self.bucket_time = 0
 
@@ -31,6 +33,7 @@ class State_Machine():
             """ 识别球 """
         elif self.state == STATE['state_recognize_ball']:
             if self.find_ball(img) is True:  # 识别球
+                self.ball_time = pyb.millis()
                 for i in range(50):
                     my_uart.send_data()
                 self.state_trans(STATE['state_2_user1'])
@@ -40,6 +43,12 @@ class State_Machine():
             my_uart.clear_data()
             """ 到达用户1区域 """
         elif self.state == STATE['state_2_user1']:
+            self.now_time = pyb.millis()
+            if self.now_time - self.ball_time < 3_000:
+                my_line.line_track(img.copy())
+                my_uart.send_data()
+                my_uart.clear_data()
+                return 0
             if self.find_user(img, 1) is True:
                 my_uart.send_data()
                 self.state_trans(STATE['state_3_yellow_climb'])
@@ -54,24 +63,21 @@ class State_Machine():
                 self.yellow_time = pyb.millis()  # 从启动开始的毫秒数
                 self.state_trans(STATE['state_4_black_obstacle'])
             else:
-                my_line.line_track(img.copy(), err=13)
+                my_line.line_track(img.copy(), err=20)
                 my_uart.send_data()
             my_uart.clear_data()
             """ 准备绕柱子  """
         elif self.state == STATE['state_4_black_obstacle']:
-            self.bucket_time = pyb.millis()  # 从启动开始的毫秒数
-            if self.bucket_time - self.yellow_time < 10_000:  # 黄色转换到黑色后10s内不识别bucket
-                my_line.line_track(img.copy())
-                my_uart.send_data()
-                my_uart.clear_data()
-
-            if self.find_bucket_obstacles(img) is True:
-                my_uart.send_data()
-                self.state_trans(STATE['state_5_user2'])
-            else:
-                my_line.line_track(img.copy())
-                my_uart.send_data()
-            my_uart.clear_data()
+            #TODO: 该状态经测试发现不需要存在，直接跳转到下一状态
+            self.state = STATE['state_5_user2']
+            #if self.find_bucket_obstacles(img) is True:
+                ##my_uart.send_data()
+                ##self.state_trans(STATE['state_5_user2'])
+                #pass
+            #else:
+                #my_line.line_track(img.copy(), err=20)
+                #my_uart.send_data()
+            #my_uart.clear_data()
             """ 到达用户2区域 """
         elif self.state == STATE['state_5_user2']:
             if self.find_user(img, 2) is True:
@@ -283,7 +289,7 @@ class State_Machine():
             Bool: True of False
         """
         # TODO: 需要根据白线转向
-        FLAG_BALCK = detect_bucket_obstacle(img, ROI=(0, 0, 80, 20))  # 上半屏幕
+        FLAG_BALCK = detect_bucket_obstacle(img, ROI=(0, 20, 80, 20))  # 上半屏幕
         if FLAG_BALCK is not True:
             return False
         print('到达桶装障碍物')

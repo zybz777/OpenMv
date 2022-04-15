@@ -8,14 +8,16 @@ from uart import my_uart
 from utils import COLOR, STATE
 import sensor
 import pyb
-
+from pyb import Pin, Timer, LED
 yellow_time = 0
 
-
+light = Timer(2, freq=50000).channel(1, Timer.PWM, pin=Pin("P6"))
 # TODO：依托于颜色判断很准才可以
 class State_Machine():
     def __init__(self):
         self.state = STATE['state_1_begin']
+        self.ball_time = 0
+        self.now_time = 0
         self.yellow_time = 0
         self.bucket_time = 0
 
@@ -24,15 +26,15 @@ class State_Machine():
             if self.find_starting_point(img) is True:
                 my_uart.send_data()
                 self.state_trans(STATE['state_recognize_ball'])
+                light.pulse_width_percent(3) # 控制亮度 0~100
             else:
-                my_line.line_track(img.copy())
+                my_line.line_track(img.copy(),err=1,type='turn', angle_limit=30)
                 my_uart.send_data()
             my_uart.clear_data()
             """ 识别球 """
         elif self.state == STATE['state_recognize_ball']:
             if self.find_ball(img) is True:  # 识别球
-                for i in range(50):
-                    my_uart.send_data()
+                my_uart.send_data()
                 self.state_trans(STATE['state_2_user1'])
             else:
                 my_line.line_track(img.copy())
@@ -44,41 +46,41 @@ class State_Machine():
                 my_uart.send_data()
                 self.state_trans(STATE['state_3_yellow_climb'])
             else:
-                my_line.line_track(img.copy())
+                my_line.line_track(img.copy(),err=5)
                 my_uart.send_data()
             my_uart.clear_data()
             """ 准备上台阶  """
         elif self.state == STATE['state_3_yellow_climb']:
             if self.find_yellow_upstair(img) is True:
                 my_uart.send_data()
-                self.yellow_time = pyb.millis()  # 从启动开始的毫秒数
                 self.state_trans(STATE['state_4_black_obstacle'])
+                #self.yellow_time = pyb.millis()  # 从启动开始的毫秒数
             else:
-                my_line.line_track(img.copy(), err=13)
+                my_line.line_track(img.copy(),err=1,type='turn', angle_limit=30)
                 my_uart.send_data()
             my_uart.clear_data()
             """ 准备绕柱子  """
         elif self.state == STATE['state_4_black_obstacle']:
-            self.bucket_time = pyb.millis()  # 从启动开始的毫秒数
-            if self.bucket_time - self.yellow_time < 10_000:  # 黄色转换到黑色后10s内不识别bucket
-                my_line.line_track(img.copy())
-                my_uart.send_data()
-                my_uart.clear_data()
-
-            if self.find_bucket_obstacles(img) is True:
-                my_uart.send_data()
-                self.state_trans(STATE['state_5_user2'])
-            else:
-                my_line.line_track(img.copy())
-                my_uart.send_data()
-            my_uart.clear_data()
+            #TODO: 该状态经测试发现不需要存在，直接跳转到下一状态
+            #self.state = STATE['state_5_user2']
+            self.state_trans(STATE['state_5_user2'])
+            self.yellow_time = pyb.millis()  # 从启动开始的毫秒数
+            light.pulse_width_percent(3) # 控制亮度 0~100完成
             """ 到达用户2区域 """
         elif self.state == STATE['state_5_user2']:
             if self.find_user(img, 2) is True:
                 my_uart.send_data()
                 self.state_trans(STATE['state_6_grass'])
+                light.pulse_width_percent(3) # 控制亮度 0~100完成
             else:
-                my_line.line_track(img.copy())
+                self.now_time = pyb.millis()
+                if self.now_time - self.yellow_time < 34500:
+                    my_line.line_track(img.copy())
+                else:
+                    print("切换至笨比步态")
+                    light.pulse_width_percent(0)
+                    my_uart.set_data(1, 'isOpen')
+                    my_line.line_track(img.copy(),err=14)
                 my_uart.send_data()
             my_uart.clear_data()
             """ 到达草地 """
@@ -87,22 +89,27 @@ class State_Machine():
                 my_uart.send_data()
                 self.state_trans(STATE['state_7_user3'])
             else:
-                my_line.line_track(img.copy())
+                my_line.line_track(img.copy(),err=1,type='turn', angle_limit=30)
+                my_uart.send_data()
             my_uart.clear_data()
             """ 到达用户3区域 """
         elif self.state == STATE['state_7_user3']:
             if self.find_user(img, 3) is True:
                 my_uart.send_data()
                 self.state_trans(STATE['state_1_begin'])
+                light.pulse_width_percent(10) # 控制亮度 0~100
             else:
-                my_line.line_track(img.copy())
+                if detect_grass(img) is True:
+                    my_line.line_track_grass(img.copy())
+                else:
+                    my_line.line_track(img.copy(),type='grass')
                 my_uart.send_data()
             my_uart.clear_data()
         else:
             pass
 
     def state_trans(self, st):
-        N = 1000
+        N = 20
         if st == STATE['state_recognize_ball']:
             for i in range(N):
                 info = my_uart.reveive_data()
@@ -114,6 +121,7 @@ class State_Machine():
             for i in range(N):
                 info = my_uart.reveive_data()
                 if '2' in info:
+                #if info != '0':
                     self.state = st  # 状态转移成功
                     print('准备检测用户1')
                     break
@@ -121,6 +129,7 @@ class State_Machine():
             for i in range(N):
                 info = my_uart.reveive_data()
                 if '3' in info:
+                #if info != '0':
                     self.state = st  # 状态转移成功
                     print('准备上台阶')
                     break
@@ -128,6 +137,7 @@ class State_Machine():
             for i in range(N):
                 info = my_uart.reveive_data()
                 if '4' in info:
+                #if info != '0':
                     self.state = st  # 状态转移成功
                     print('准备绕过柱子')
                     break
@@ -135,6 +145,7 @@ class State_Machine():
             for i in range(N):
                 info = my_uart.reveive_data()
                 if '5' in info:
+                #if info != '0':
                     self.state = st  # 状态转移成功
                     print('准备检测用户2')
                     break
@@ -142,6 +153,7 @@ class State_Machine():
             for i in range(N):
                 info = my_uart.reveive_data()
                 if '6' in info:
+                #if info != '0':
                     self.state = st
                     print('准备检测草地')
                     break
@@ -149,6 +161,7 @@ class State_Machine():
             for i in range(N):
                 info = my_uart.reveive_data()
                 if '7' in info:
+                #if info != '0':
                     self.state = st
                     print('准备检测用户3')
                     break
@@ -156,6 +169,7 @@ class State_Machine():
             for i in range(N):
                 info = my_uart.reveive_data()
                 if '8' in info:
+                #if info != '0':
                     self.state = st
                     print('准备检测起点')
                     break
@@ -283,7 +297,7 @@ class State_Machine():
             Bool: True of False
         """
         # TODO: 需要根据白线转向
-        FLAG_BALCK = detect_bucket_obstacle(img, ROI=(0, 0, 80, 20))  # 上半屏幕
+        FLAG_BALCK = detect_bucket_obstacle(img, ROI=(0, 20, 80, 20))  # 上半屏幕
         if FLAG_BALCK is not True:
             return False
         print('到达桶装障碍物')

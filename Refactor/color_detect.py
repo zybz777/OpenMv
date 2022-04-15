@@ -190,7 +190,7 @@ def detect_bucket_obstacle(img, ROI=(0, 0, 80, 20)):
         img (img): img
         input_color (str): BLACK, BLUE etc.
     """
-    Area_th = int((ROI[2] * ROI[3]) / 2)  # ROI 区域的 1/4
+    Area_th = int((ROI[2] * ROI[3]) / 10)  # ROI 区域的 1/4
     blobs = img.find_blobs(COLOR_THRESHOLD['BLACK'], merge=True, area_threshold=Area_th, margin=20, roi=ROI, x_stride=40, y_stride=6)
     # exit 1
     if blobs is None:
@@ -206,9 +206,9 @@ def detect_bucket_obstacle(img, ROI=(0, 0, 80, 20)):
     # print(x, y, w, h) # display [x y w h]
     # print('Area', w * h)  # display area
     ratio = round(w / h, 2)
-    ratio_limit = 1  # TODO: 需要赛道实测，先给出一个大概值
+    ratio_limit = 0.5  # TODO: 需要赛道实测，先给出一个大概值
     # exit 3
-    if ratio > ratio_limit:
+    if ratio < ratio_limit:
         return False
 
     # print("ratio", round(w / h, 2))  # display ratio
